@@ -1,0 +1,97 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Sample API",
+    "version": "1.0.0",
+    "description": "Initial Swagger specification for Sample API"
+  },
+  "paths": {
+    "/submissions": {
+      "get": {
+        "summary": "List submissions with details",
+        "responses": {
+          "200": {
+            "description": "A list of submissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubmissionDetail"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SubmissionDetail": {
+        "type": "object",
+        "properties": {
+          "submissionDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "submissionTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "expectedPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)"
+          },
+          "age": {
+            "type": "integer"
+          },
+          "sex": {
+            "type": "string"
+          },
+          "salary": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)"
+          },
+          "isSickLeaveIncluded": {
+            "type": "boolean"
+          },
+          "totalAccumulatedFunds": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)"
+          },
+          "nominalPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)"
+          },
+          "realPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)"
+          },
+          "postalCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "submissionDate",
+          "submissionTime",
+          "expectedPension",
+          "age",
+          "sex",
+          "salary",
+          "isSickLeaveIncluded",
+          "totalAccumulatedFunds",
+          "nominalPension",
+          "realPension",
+          "postalCode"
+        ]
+      }
+    }
+  }
+}
