@@ -5,6 +5,12 @@
     "version": "1.0.0",
     "description": "Initial Swagger specification for Sample API"
   },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local development server"
+    }
+  ],
   "tags": [
     {
       "name": "Admin",
