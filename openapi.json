@@ -293,13 +293,13 @@
             "description": "Currency value, format: digits.digits (2 decimal places)",
             "example": "150000.00"
           },
-          "yearWorkStart":{
+          "yearWorkStart": {
             "type": "integer",
             "pattern": "^\\d{4}$",
             "description": "Year when an individual started working",
             "example": 1900
           },
-          "yearDesiredRetirement":{
+          "yearDesiredRetirement": {
             "type": "integer",
             "pattern": "^\\d{4}",
             "description": "Year when an individual wants to retire",
@@ -312,12 +312,16 @@
           },
           "jobs": {
             "type": "array",
-            "items": {"$ref": "#/components/schemas/Job"},
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            },
             "minItems": 1
           },
           "leaves": {
             "type": "array",
-            "items": {"$ref": "#/components/schemas/Leave"},
+            "items": {
+              "$ref": "#/components/schemas/Leave"
+            },
             "minItems": 1
           }
         },
@@ -427,7 +431,7 @@
           "yearDesiredRetirement"
         ]
       },
-      "Leave":{
+      "Leave": {
         "type": "object",
         "properties": {
           "startDate": {
@@ -443,10 +447,12 @@
             "example": "15-02-2015"
           }
         },
-        "required": ["startDate"]
+        "required": [
+          "startDate"
+        ]
       },
       "Job": {
-        "type":"object",
+        "type": "object",
         "properties": {
           "startDate": {
             "type": "string",
@@ -467,7 +473,10 @@
             "example": 10000
           }
         },
-        "required": ["startDate", "baseSalary"]
+        "required": [
+          "startDate",
+          "baseSalary"
+        ]
       },
       "CalculationAdminDetail": {
         "type": "object",
@@ -544,6 +553,7 @@
           }
         },
         "required": [
+          "calculationId",
           "calculationDate",
           "calculationTime",
           "expectedPension",
