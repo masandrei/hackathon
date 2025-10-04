@@ -293,22 +293,32 @@
             "description": "Currency value, format: digits.digits (2 decimal places)",
             "example": "150000.00"
           },
-          "nominalPension": {
-            "type": "string",
-            "pattern": "^\\d+\\.\\d{2}$",
-            "description": "Currency value, format: digits.digits (2 decimal places)",
-            "example": "2600.00"
+          "yearWorkStart":{
+            "type": "integer",
+            "pattern": "^\\d{4}$",
+            "description": "Year when an individual started working",
+            "example": 1900
           },
-          "realPension": {
-            "type": "string",
-            "pattern": "^\\d+\\.\\d{2}$",
-            "description": "Currency value, format: digits.digits (2 decimal places)",
-            "example": "2400.00"
+          "yearDesiredRetirement":{
+            "type": "integer",
+            "pattern": "^\\d{4}",
+            "description": "Year when an individual wants to retire",
+            "example": 1960
           },
           "postalCode": {
             "type": "string",
             "pattern": "^\\d{2}-\\d{3}$",
             "example": "00-950"
+          },
+          "jobs": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/Job"},
+            "minItems": 1
+          },
+          "leaves": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/Leave"},
+            "minItems": 1
           }
         },
         "required": [
@@ -320,10 +330,20 @@
           "salary",
           "isSickLeaveIncluded",
           "totalAccumulatedFunds",
-          "nominalPension",
-          "realPension",
-          "postalCode"
+          "yearWorkStart",
+          "yearDesiredRetirement",
+          "jobs",
+          "leaves"
         ]
+      },
+      "CalculationResponse": {
+        "type": "object",
+        "properties": {
+          "pension": {
+            "type": "string",
+            "pattern": "^\\d+.\\d{2}$"
+          }
+        }
       },
       "CalculationDetail": {
         "type": "object",
@@ -403,11 +423,51 @@
           "sex",
           "salary",
           "isSickLeaveIncluded",
-          "totalAccumulatedFunds",
-          "nominalPension",
-          "realPension",
-          "postalCode"
+          "yearWorkStart",
+          "yearDesiredRetirement"
         ]
+      },
+      "Leave":{
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{2}-\\d{4}$",
+            "description": "Start date of the sick leave",
+            "example": "15-02-2015"
+          },
+          "endDate": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{2}-\\d{4}$",
+            "description": "End date of the sick leave",
+            "example": "15-02-2015"
+          }
+        },
+        "required": ["startDate"]
+      },
+      "Job": {
+        "type":"object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{2}-\\d{4}$",
+            "description": "Start date of the job",
+            "example": "15-02-2015"
+          },
+          "endDate": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{2}-\\d{4}$",
+            "description": "End date of the job",
+            "example": "15-02-2015"
+          },
+          "baseSalary": {
+            "type": "integer",
+            "pattern": "^\\d$",
+            "description": "Base salary in the company",
+            "example": 10000
+          }
+        },
+        "required": ["startDate", "baseSalary"]
       },
       "CalculationAdminDetail": {
         "type": "object",
