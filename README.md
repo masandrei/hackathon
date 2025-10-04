@@ -7,6 +7,8 @@
 
 ### Front-end
 
+Dev URL: http://localhost:3000
+
 To run project:
 ```bash
 npm run dev
@@ -34,4 +36,4 @@ npx openapi-typescript-codegen --input ../openapi.json --output ./src/api-client
 
 ### Back-end
 
-Dev URL: http://localhost:8080
+Dev URL: http://localhost:8000
