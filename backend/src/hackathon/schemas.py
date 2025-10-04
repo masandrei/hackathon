@@ -82,3 +82,15 @@ class CalculationRequest(BaseModel):
 class CalculationResponse(BaseModel):
     calculationId: str
     # Additional fields can be added here as needed
+
+# -------------------------- Analysis Schemas --------------------------
+
+class AnalysisResponse(BaseModel):
+    basic_summary: str
+    detailed_analysis: str
+    calculation_data: Dict
+    success: bool = True
+
+class AnalysisErrorResponse(BaseModel):
+    error: str
+    success: bool = False

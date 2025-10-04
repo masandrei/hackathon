@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from .schemas import (
     DatabaseItemsResponse, DatabaseItemResponse, HealthCheckResponse, 
     ErrorResponse, StatisticsResponse, StatisticsDataResponse, LifeExpectancyResponse, LifeExpectancyData,
-    CalculationRequest, CalculationResponse
+    CalculationRequest, CalculationResponse, AnalysisResponse, AnalysisErrorResponse
 )
 from .models import Calculation, Job, Leave
 from .mapper import GROWTH, AVERAGE_WAGE, VALORIZATION, INFLATION, LIFE_EXPECTANCY, LIFE_EXPECTANCY_MALE, LIFE_EXPECTANCY_FEMALE, META
@@ -187,6 +187,32 @@ def submit_calculation(request: CalculationRequest, db: Session = Depends(get_db
     db.commit()
     db.refresh(calculation)
     return CalculationResponse(calculationId=calculation.id)
+
+
+@app.post(
+    "/calculations/analyze",
+    response_model=AnalysisResponse,
+    status_code=200,
+)
+def analyze_calculation(request: CalculationRequest):
+    """Analyze pension calculation with AI-powered insights"""
+    try:
+        from .gemini_client import analyze_pension_from_api_request
+        
+        # Get AI analysis
+        result = analyze_pension_from_api_request(request)
+        
+        if "error" in result:
+            return AnalysisErrorResponse(error=result["error"])
+        
+        return AnalysisResponse(
+            basic_summary=result["basic_summary"],
+            detailed_analysis=result["detailed_analysis"],
+            calculation_data=result["calculation_data"]
+        )
+        
+    except Exception as e:
+        return AnalysisErrorResponse(error=f"Analysis failed: {str(e)}")
 
 
 def main():

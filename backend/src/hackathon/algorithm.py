@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Optional
-from mapper import INFLATION, VALORIZATION, AVERAGE_WAGE, GROWTH
+from .mapper import INFLATION, VALORIZATION, AVERAGE_WAGE, GROWTH
 
 
 # -------------------------- Data models --------------------------
