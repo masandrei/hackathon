@@ -1,0 +1,572 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Symulator ZUS API",
+    "version": "1.0.0",
+    "description": "Initial Swagger specification for Sample API"
+  },
+  "tags": [
+    {
+      "name": "Admin",
+      "description": "Endpoints for administration dashboard."
+    },
+    {
+      "name": "User",
+      "description": "Endpoints available for all users."
+    }
+  ],
+  "paths": {
+    "/calculations/{id}/download": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Download specific calculation as PDF file",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "calculation identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF file containing the calculation",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Calculation not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/calculations/{id}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get detailed calculation by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "calculation identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detailed calculation information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalculationDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Calculation not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/calculations": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List all submitted calculations",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (starting from 1)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of submitted calculations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "submissions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CalculationAdminDetail"
+                      }
+                    },
+                    "page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "pageSize": {
+                      "type": "integer",
+                      "example": 20
+                    },
+                    "totalItems": {
+                      "type": "integer",
+                      "example": 100
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "example": 5
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Submit new calculation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created calculation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "calculationId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "b3e1a7e2-8c2d-4e6a-9f1a-2b7c3e4d5f6a"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/calculations/download": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Download all submitted calculations in XLS format",
+        "parameters": [
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "Language for the exported file",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "pl-PL"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "XLS file containing all submitted calculations",
+            "content": {
+              "application/vnd.ms-excel": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CalculationRequest": {
+        "type": "object",
+        "properties": {
+          "calculationDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2025-10-04"
+          },
+          "calculationTime": {
+            "type": "string",
+            "format": "time",
+            "description": "calculation time in UTC",
+            "example": "08:15:30Z"
+          },
+          "expectedPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2450.75"
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 42,
+            "description": "Age must be a non-negative integer, up to 6 digits"
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female"
+            ],
+            "description": "Sex of the person, must be 'male' or 'female'",
+            "example": "female"
+          },
+          "salary": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "5200.00"
+          },
+          "isSickLeaveIncluded": {
+            "type": "boolean",
+            "example": true
+          },
+          "totalAccumulatedFunds": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "150000.00"
+          },
+          "yearWorkStart": {
+            "type": "integer",
+            "pattern": "^\\d{4}$",
+            "description": "Year when an individual started working",
+            "example": 1900
+          },
+          "yearDesiredRetirement": {
+            "type": "integer",
+            "pattern": "^\\d{4}",
+            "description": "Year when an individual wants to retire",
+            "example": 1960
+          },
+          "postalCode": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{3}$",
+            "example": "00-950"
+          },
+          "jobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            },
+            "minItems": 1
+          },
+          "leaves": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Leave"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "calculationDate",
+          "calculationTime",
+          "expectedPension",
+          "age",
+          "sex",
+          "salary",
+          "isSickLeaveIncluded",
+          "totalAccumulatedFunds",
+          "yearWorkStart",
+          "yearDesiredRetirement",
+          "jobs",
+          "leaves"
+        ]
+      },
+      "CalculationResponse": {
+        "type": "object",
+        "properties": {
+          "pension": {
+            "type": "string",
+            "pattern": "^\\d+.\\d{2}$"
+          }
+        }
+      },
+      "CalculationDetail": {
+        "type": "object",
+        "properties": {
+          "calculationDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2025-10-04"
+          },
+          "calculationTime": {
+            "type": "string",
+            "format": "time",
+            "description": "calculation time in UTC",
+            "example": "08:15:30Z"
+          },
+          "expectedPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2450.75"
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 42,
+            "description": "Age must be a non-negative integer, up to 6 digits"
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female"
+            ],
+            "description": "Sex of the person, must be 'male' or 'female'",
+            "example": "female"
+          },
+          "salary": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "5200.00"
+          },
+          "isSickLeaveIncluded": {
+            "type": "boolean",
+            "example": true
+          },
+          "totalAccumulatedFunds": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "150000.00"
+          },
+          "nominalPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2600.00"
+          },
+          "realPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2400.00"
+          },
+          "postalCode": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{3}$",
+            "example": "00-950"
+          }
+        },
+        "required": [
+          "calculationId",
+          "calculationDate",
+          "calculationTime",
+          "expectedPension",
+          "age",
+          "sex",
+          "salary",
+          "isSickLeaveIncluded",
+          "yearWorkStart",
+          "yearDesiredRetirement"
+        ]
+      },
+      "Leave": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{2}-\\d{4}$",
+            "description": "Start date of the sick leave",
+            "example": "15-02-2015"
+          },
+          "endDate": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{2}-\\d{4}$",
+            "description": "End date of the sick leave",
+            "example": "15-02-2015"
+          }
+        },
+        "required": [
+          "startDate"
+        ]
+      },
+      "Job": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{2}-\\d{4}$",
+            "description": "Start date of the job",
+            "example": "15-02-2015"
+          },
+          "endDate": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{2}-\\d{4}$",
+            "description": "End date of the job",
+            "example": "15-02-2015"
+          },
+          "baseSalary": {
+            "type": "integer",
+            "pattern": "^\\d$",
+            "description": "Base salary in the company",
+            "example": 10000
+          }
+        },
+        "required": [
+          "startDate",
+          "baseSalary"
+        ]
+      },
+      "CalculationAdminDetail": {
+        "type": "object",
+        "properties": {
+          "calculationId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "b3e1a7e2-8c2d-4e6a-9f1a-2b7c3e4d5f6a"
+          },
+          "calculationDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2025-10-04"
+          },
+          "calculationTime": {
+            "type": "string",
+            "format": "time",
+            "description": "calculation time in UTC",
+            "example": "08:15:30Z"
+          },
+          "expectedPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2450.75"
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 42,
+            "description": "Age must be a non-negative integer, up to 6 digits"
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female"
+            ],
+            "description": "Sex of the person, must be 'male' or 'female'",
+            "example": "female"
+          },
+          "salary": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "5200.00"
+          },
+          "isSickLeaveIncluded": {
+            "type": "boolean",
+            "example": true
+          },
+          "totalAccumulatedFunds": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "150000.00"
+          },
+          "nominalPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2600.00"
+          },
+          "realPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2400.00"
+          },
+          "postalCode": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{3}$",
+            "example": "00-950"
+          }
+        },
+        "required": [
+          "calculationId",
+          "calculationDate",
+          "calculationTime",
+          "expectedPension",
+          "age",
+          "sex",
+          "salary",
+          "isSickLeaveIncluded",
+          "totalAccumulatedFunds",
+          "nominalPension",
+          "realPension",
+          "postalCode"
+        ]
+      }
+    }
+  }
+}
