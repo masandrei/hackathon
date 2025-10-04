@@ -18,6 +18,7 @@
   "paths": {
     "/calculations/{id}/download": {
       "get": {
+        "operationId": "downloadCalculationById",
         "tags": [
           "User"
         ],
@@ -56,6 +57,7 @@
     },
     "/calculations/{id}": {
       "get": {
+        "operationId": "getCalculationById",
         "tags": [
           "User"
         ],
@@ -93,6 +95,7 @@
     },
     "/calculations": {
       "get": {
+        "operationId": "listCalculations",
         "tags": [
           "Admin"
         ],
@@ -163,6 +166,7 @@
         }
       },
       "post": {
+        "operationId": "submitCalculation",
         "tags": [
           "User"
         ],
@@ -205,6 +209,7 @@
     },
     "/calculations/download": {
       "get": {
+        "operationId": "downloadAllCalculations",
         "tags": [
           "Admin"
         ],
