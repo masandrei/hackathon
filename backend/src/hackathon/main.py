@@ -4,22 +4,32 @@ import uvicorn
 import aiosqlite
 from datetime import datetime
 from typing import List
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from .schemas import (
     DatabaseItemsResponse, DatabaseItemResponse, HealthCheckResponse, 
-    ErrorResponse, StatisticsResponse, StatisticsDataResponse, LifeExpectancyResponse, LifeExpectancyData
+    ErrorResponse, StatisticsResponse, StatisticsDataResponse, LifeExpectancyResponse, LifeExpectancyData,
+    CalculationRequest, CalculationResponse
 )
+from .models import Calculation, Job, Leave
 from .mapper import GROWTH, AVERAGE_WAGE, VALORIZATION, INFLATION, LIFE_EXPECTANCY, LIFE_EXPECTANCY_MALE, LIFE_EXPECTANCY_FEMALE, META
+import uuid
+import os
 
 app = FastAPI(title="Hackathon API")
 
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///hackathon.db")
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Dependency for getting a database connection
-async def get_db():
-    db = await aiosqlite.connect("hackathon.db")
+
+def get_db():
+    db = SessionLocal()
     try:
         yield db
     finally:
-        await db.close()
+        db.close()
 
 
 # Health check endpoint
@@ -133,6 +143,51 @@ async def global_exception_handler(request, exc):
             timestamp=datetime.now()
         ).dict()
     )
+
+
+@app.post(
+    "/calculations",
+    response_model=CalculationResponse,
+    status_code=201,
+)
+def submit_calculation(request: CalculationRequest, db: Session = Depends(get_db)):
+    calculation_id = str(uuid.uuid4())
+    calculation = Calculation(
+        id=calculation_id,
+        calculation_timestamp=f"{request.calculationDate}T{request.calculationTime}",
+        expected_pension=request.expectedPension,
+        age=request.age,
+        sex=request.sex,
+        salary=request.salary,
+        is_sick_leave_included=request.isSickLeaveIncluded,
+        total_accumulated_funds=request.totalAccumulatedFunds,
+        year_work_start=request.yearWorkStart,
+        year_desired_retirement=request.yearDesiredRetirement,
+        postal_code=request.postalCode,
+    )
+    db.add(calculation)
+    db.flush()  # Get calculation.id for relationships
+    # Add jobs
+    for job in request.jobs:
+        job_obj = Job(
+            calculation_id=calculation.id,
+            start_date=job.startDate,
+            end_date=job.endDate,
+            base_salary=job.baseSalary,
+        )
+        db.add(job_obj)
+    # Add leaves
+    for leave in request.leaves:
+        leave_obj = Leave(
+            calculation_id=calculation.id,
+            start_date=leave.startDate,
+            end_date=leave.endDate,
+        )
+        db.add(leave_obj)
+    db.commit()
+    db.refresh(calculation)
+    return CalculationResponse(calculationId=calculation.id)
+
 
 def main():
     uvicorn.run("hackathon.main:app", host="127.0.0.1", port=8080, reload=True, app_dir="src")
