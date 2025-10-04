@@ -1,23 +1,116 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Sample API",
+    "title": "Symulator ZUS API",
     "version": "1.0.0",
     "description": "Initial Swagger specification for Sample API"
   },
+  "tags": [
+    {
+      "name": "Admin",
+      "description": "Endpoints for administration dashboard."
+    },
+    {
+      "name": "User",
+      "description": "Endpoints available for all users."
+    }
+  ],
   "paths": {
-    "/submissions": {
+    "/calculations/{id}": {
       "get": {
-        "summary": "List submissions with details",
+        "tags": [
+          "User"
+        ],
+        "summary": "Get detailed calculation by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "calculation identifier"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A list of submissions",
+            "description": "Detailed calculation information",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SubmissionDetail"
+                  "$ref": "#/components/schemas/CalculationDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "calculation not found"
+          }
+        }
+      }
+    },
+    "/calculations": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List all submitted calculations",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (starting from 1)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of submitted calculations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "submissions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CalculationAdminDetail"
+                      }
+                    },
+                    "page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "pageSize": {
+                      "type": "integer",
+                      "example": 20
+                    },
+                    "totalItems": {
+                      "type": "integer",
+                      "example": 100
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "example": 5
+                    }
                   }
                 }
               }
@@ -26,99 +119,316 @@
         }
       },
       "post": {
+        "tags": [
+          "User"
+        ],
         "summary": "Submit new calculation",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SubmissionDetail"
+                "$ref": "#/components/schemas/CalculationRequest"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Submission created successfully"
+            "description": "Successfully created calculation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "calculationId": {
+                      "type": "integer",
+                      "example": 12345
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input"
           }
         }
-      },
-      "/submissions/download": {
-        "get": {
-          "summary": "Download submissions in XLS format",
-          "responses": {
-            "200": {
-              "description": "XLS file containing submissions",
-              "content": {
-                "application/vnd.ms-excel": {
-                  "schema": {
-                    "type": "string",
-                    "format": "binary"
-                  }
+      }
+    },
+    "/calculations/download": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Download all submitted calculations in XLS format",
+        "parameters": [
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "Language for the exported file",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "pl-PL"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "XLS file containing all submitted calculations",
+            "content": {
+              "application/vnd.ms-excel": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
           }
         }
       }
-    },
+    }
+  },
+  "components": {
     "schemas": {
-      "SubmissionDetail": {
+      "CalculationRequest": {
         "type": "object",
         "properties": {
-          "submissionDate": {
+          "calculationDate": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2025-10-04"
           },
-          "submissionTime": {
+          "calculationTime": {
             "type": "string",
-            "format": "time"
+            "format": "time",
+            "description": "calculation time in UTC",
+            "example": "08:15:30Z"
           },
           "expectedPension": {
             "type": "string",
             "pattern": "^\\d+\\.\\d{2}$",
-            "description": "Currency value, format: digits.digits (2 decimal places)"
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2450.75"
           },
           "age": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0,
+            "example": 42,
+            "description": "Age must be a non-negative integer, up to 6 digits"
           },
           "sex": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "male",
+              "female"
+            ],
+            "description": "Sex of the person, must be 'male' or 'female'",
+            "example": "female"
           },
           "salary": {
             "type": "string",
             "pattern": "^\\d+\\.\\d{2}$",
-            "description": "Currency value, format: digits.digits (2 decimal places)"
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "5200.00"
           },
           "isSickLeaveIncluded": {
-            "type": "boolean"
+            "type": "boolean",
+            "example": true
           },
           "totalAccumulatedFunds": {
             "type": "string",
             "pattern": "^\\d+\\.\\d{2}$",
-            "description": "Currency value, format: digits.digits (2 decimal places)"
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "150000.00"
           },
           "nominalPension": {
             "type": "string",
             "pattern": "^\\d+\\.\\d{2}$",
-            "description": "Currency value, format: digits.digits (2 decimal places)"
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2600.00"
           },
           "realPension": {
             "type": "string",
             "pattern": "^\\d+\\.\\d{2}$",
-            "description": "Currency value, format: digits.digits (2 decimal places)"
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2400.00"
           },
           "postalCode": {
             "type": "string",
-            "pattern": "^\\d{2}-\\d{3}$"
+            "pattern": "^\\d{2}-\\d{3}$",
+            "example": "00-950"
           }
         },
         "required": [
-          "submissionDate",
-          "submissionTime",
+          "calculationDate",
+          "calculationTime",
+          "expectedPension",
+          "age",
+          "sex",
+          "salary",
+          "isSickLeaveIncluded",
+          "totalAccumulatedFunds",
+          "nominalPension",
+          "realPension",
+          "postalCode"
+        ]
+      },
+      "CalculationDetail": {
+        "type": "object",
+        "properties": {
+          "calculationDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2025-10-04"
+          },
+          "calculationTime": {
+            "type": "string",
+            "format": "time",
+            "description": "calculation time in UTC",
+            "example": "08:15:30Z"
+          },
+          "expectedPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2450.75"
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 42,
+            "description": "Age must be a non-negative integer, up to 6 digits"
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female"
+            ],
+            "description": "Sex of the person, must be 'male' or 'female'",
+            "example": "female"
+          },
+          "salary": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "5200.00"
+          },
+          "isSickLeaveIncluded": {
+            "type": "boolean",
+            "example": true
+          },
+          "totalAccumulatedFunds": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "150000.00"
+          },
+          "nominalPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2600.00"
+          },
+          "realPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2400.00"
+          },
+          "postalCode": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{3}$",
+            "example": "00-950"
+          }
+        },
+        "required": [
+          "calculationDate",
+          "calculationTime",
+          "expectedPension",
+          "age",
+          "sex",
+          "salary",
+          "isSickLeaveIncluded",
+          "totalAccumulatedFunds",
+          "nominalPension",
+          "realPension",
+          "postalCode"
+        ]
+      },
+      "CalculationAdminDetail": {
+        "type": "object",
+        "properties": {
+          "calculationDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2025-10-04"
+          },
+          "calculationTime": {
+            "type": "string",
+            "format": "time",
+            "description": "calculation time in UTC",
+            "example": "08:15:30Z"
+          },
+          "expectedPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2450.75"
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 42,
+            "description": "Age must be a non-negative integer, up to 6 digits"
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female"
+            ],
+            "description": "Sex of the person, must be 'male' or 'female'",
+            "example": "female"
+          },
+          "salary": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "5200.00"
+          },
+          "isSickLeaveIncluded": {
+            "type": "boolean",
+            "example": true
+          },
+          "totalAccumulatedFunds": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "150000.00"
+          },
+          "nominalPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2600.00"
+          },
+          "realPension": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Currency value, format: digits.digits (2 decimal places)",
+            "example": "2400.00"
+          },
+          "postalCode": {
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{3}$",
+            "example": "00-950"
+          }
+        },
+        "required": [
+          "calculationDate",
+          "calculationTime",
           "expectedPension",
           "age",
           "sex",
