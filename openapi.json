@@ -24,10 +24,47 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Submit new calculation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmissionDetail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Submission created successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      },
+      "/submissions/download": {
+        "get": {
+          "summary": "Download submissions in XLS format",
+          "responses": {
+            "200": {
+              "description": "XLS file containing submissions",
+              "content": {
+                "application/vnd.ms-excel": {
+                  "schema": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-    }
-  },
-  "components": {
+    },
     "schemas": {
       "SubmissionDetail": {
         "type": "object",
@@ -75,7 +112,8 @@
             "description": "Currency value, format: digits.digits (2 decimal places)"
           },
           "postalCode": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\d{2}-\\d{3}$"
           }
         },
         "required": [
