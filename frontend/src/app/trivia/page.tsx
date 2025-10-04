@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export default function CiekawostkiPage() {
+export default function TriviaPage() {
     const triviaFacts = [
         {
             id: 1,
