@@ -1,0 +1,8 @@
+# Font files directory
+# Place Avenir font files here:
+# - avenir-regular.woff2
+# - avenir-medium.woff2
+# - avenir-heavy.woff2
+
+# If Avenir fonts are not available, the app will fall back to system fonts
+

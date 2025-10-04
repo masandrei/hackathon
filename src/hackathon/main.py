@@ -1,5 +1,6 @@
 import uuid
 from fastapi import FastAPI
+from hackathon.mapper import AVERAGE_WAGE
 from hackathon.models import Calculation, CalculationRequest, CalculationResponse
 from hackathon.algorithm import compute_pension_funds, compute_montly_pension 
 import uvicorn
@@ -21,7 +22,7 @@ def create_calculation(calculation: CalculationRequest):
     total_funds = compute_pension_funds(calc)
     monthly_pension = compute_montly_pension(total_funds, calc.age)
     # TODO: save calculation to db
-    return CalculationResponse(nominal_monthly_pension=monthly_pension["nominal"], real_monthly_pension=monthly_pension["real"])
+    return CalculationResponse(nominal_monthly_pension=monthly_pension["nominal"], real_monthly_pension=monthly_pension["real"], average_wage=AVERAGE_WAGE[calc.age])
 
 
 def main():

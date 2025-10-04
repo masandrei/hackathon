@@ -5,6 +5,12 @@
     "version": "1.0.0",
     "description": "Initial Swagger specification for Sample API"
   },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local development server"
+    }
+  ],
   "tags": [
     {
       "name": "Admin",
@@ -18,6 +24,7 @@
   "paths": {
     "/calculations/{id}/download": {
       "get": {
+        "operationId": "downloadCalculationById",
         "tags": [
           "User"
         ],
@@ -56,6 +63,7 @@
     },
     "/calculations/{id}": {
       "get": {
+        "operationId": "getCalculationById",
         "tags": [
           "User"
         ],
@@ -93,6 +101,7 @@
     },
     "/calculations": {
       "get": {
+        "operationId": "listCalculations",
         "tags": [
           "Admin"
         ],
@@ -163,6 +172,7 @@
         }
       },
       "post": {
+        "operationId": "submitCalculation",
         "tags": [
           "User"
         ],
@@ -205,6 +215,7 @@
     },
     "/calculations/download": {
       "get": {
+        "operationId": "downloadAllCalculations",
         "tags": [
           "Admin"
         ],
