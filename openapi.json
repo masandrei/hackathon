@@ -16,6 +16,44 @@
     }
   ],
   "paths": {
+    "/calculations/{id}/download": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Download specific calculation as PDF file",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "calculation identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF file containing the calculation",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Calculation not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/calculations/{id}": {
       "get": {
         "tags": [
@@ -45,7 +83,10 @@
             }
           },
           "404": {
-            "description": "calculation not found"
+            "description": "Calculation not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -115,6 +156,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       },
@@ -141,8 +185,9 @@
                 "schema": {
                   "properties": {
                     "calculationId": {
-                      "type": "integer",
-                      "example": 12345
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "b3e1a7e2-8c2d-4e6a-9f1a-2b7c3e4d5f6a"
                     }
                   }
                 }
@@ -151,6 +196,9 @@
           },
           "400": {
             "description": "Invalid input"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -184,6 +232,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -344,6 +395,7 @@
           }
         },
         "required": [
+          "calculationId",
           "calculationDate",
           "calculationTime",
           "expectedPension",
@@ -360,6 +412,11 @@
       "CalculationAdminDetail": {
         "type": "object",
         "properties": {
+          "calculationId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "b3e1a7e2-8c2d-4e6a-9f1a-2b7c3e4d5f6a"
+          },
           "calculationDate": {
             "type": "string",
             "format": "date",
