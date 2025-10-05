@@ -234,7 +234,7 @@ export function Step6Summary() {
               Stopa zastąpienia
             </div>
             <div className="text-4xl font-black mb-2">
-              {results?.percentageToAverage || 0}%
+              {results?.percentageToAverage ? results.percentageToAverage.toFixed(2) : '0.00'}%
             </div>
             <div className="text-sm opacity-80">do średniej krajowej</div>
           </div>
