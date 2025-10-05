@@ -184,7 +184,7 @@ export default function AdminPanel() {
                                 Panel Administracyjny
                             </h1>
                             <p className="text-xl text-white/90 max-w-3xl mx-auto">
-                                Zarządzaj wszystkimi obliczeniami emerytur w systemie
+                                Podsumowanie wszystkich obliczeń w systemie
                             </p>
                             <div className="pt-4">
                                 <Button
@@ -206,32 +206,11 @@ export default function AdminPanel() {
                 {/* Content Section */}
                 <section className="py-16">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        {/* Stats Cards */}
-                        <div className="grid gap-6 md:grid-cols-3 mb-8">
-                            <Card className="p-6 bg-gradient-to-r from-[#00993F]/10 to-[#00416E]/10 border-[#00993F]/20">
-                                <div className="text-center">
-                                    <div className="text-3xl font-bold text-[#00993F] mb-2">
-                                        {pagination.totalItems}
-                                    </div>
-                                    <div className="text-sm text-gray-600">Wszystkie obliczenia</div>
-                                </div>
-                            </Card>
-                            <Card className="p-6 bg-gradient-to-r from-[#00993F]/10 to-[#00416E]/10 border-[#00993F]/20">
-                                <div className="text-center">
-                                    <div className="text-3xl font-bold text-[#00993F] mb-2">
-                                        {calculations.filter(c => c.sex === 'female').length}
-                                    </div>
-                                    <div className="text-sm text-gray-600">Kobiety</div>
-                                </div>
-                            </Card>
-                            <Card className="p-6 bg-gradient-to-r from-[#00993F]/10 to-[#00416E]/10 border-[#00993F]/20">
-                                <div className="text-center">
-                                    <div className="text-3xl font-bold text-[#00993F] mb-2">
-                                        {calculations.filter(c => c.sex === 'male').length}
-                                    </div>
-                                    <div className="text-sm text-gray-600">Mężczyźni</div>
-                                </div>
-                            </Card>
+                        {/* Total Responses as Regular Text */}
+                        <div className="mb-8 text-center">
+                            <span className="text-lg font-medium text-gray-700">
+                                Liczba wszystkich obliczeń w systemie: <span className="font-semibold text-[#00993F]">{pagination.totalItems}</span>
+                            </span>
                         </div>
 
                         {/* Loading State */}
