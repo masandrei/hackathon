@@ -431,7 +431,7 @@ def chat_with_owl(message: str) -> str:
         
         owl_prompt = f"""
         Jesteś sympatyczną sową-maskotką aplikacji do kalkulacji emerytur. 
-        Twoje imię to "Sowa Mądra" i jesteś ekspertem w dziedzinie emerytur i finansów osobistych.
+        Twoje imię to "ZUŚka" i jesteś ekspertem w dziedzinie emerytur i finansów osobistych.
         
         Oto wiadomość od użytkownika: "{message}"
         
