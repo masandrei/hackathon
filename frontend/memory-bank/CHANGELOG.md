@@ -4,6 +4,41 @@ Historia zmian w dokumentacji memory-bank.
 
 ---
 
+## [3.0.0] - 2025-10-05 - Backend Integration Complete
+
+### 🔗 Full Stack Integration
+**Added:** Complete integration of Next.js frontend with FastAPI backend
+
+### ➕ Dodane
+- **14-backend-integration.md** — Kompletna dokumentacja integracji backend-frontend
+- API Client z konfiguracją zmiennych środowiskowych
+- StatisticsService dla endpointów statystyk i health check
+- Hook `useApiHealth` i komponent `ApiStatusIndicator`
+- 7 nowych plików dokumentacji w root: `INTEGRATION.md`, `QUICK_START.md`, `BACKEND_SETUP.md`, etc.
+- Skrypty setup: `START_BACKEND.sh`, `CREATE_ENV_FILE.sh`
+- Clean database migration z poprawnym schematem
+
+### 🐛 Naprawione
+- **Sex field mapping:** male/female → M/F w backendzie
+- **Database schema:** Poprawione nazwy kolumn (calculation_id, calculation_datetime)
+- **JSON serialization:** Datetime objects w error responses
+- **AdminService:** Endpoint /download → /export
+- **CORS errors:** Rozwiązane błędy 500 z proper exception handling
+
+### ✏️ Zmienione
+- Backend models: Rozdzielone Pydantic (schemas) i SQLAlchemy (models)
+- Admin Panel: Refactor na typed API client
+- Error handling: Graceful fallback na mock data
+- OpenAPI config: Dynamic base URL z environment variables
+
+### 🗄️ Technical
+- **Database:** SQLite z migracją `f093b4da986c_initial_schema_with_dbcalculation`
+- **API Endpoints:** POST/GET /calculations, GET /calculations/export, GET /health, GET /statistics
+- **Environment:** .env.local support z NEXT_PUBLIC_API_BASE_URL
+- **Data Storage:** backend/hackathon.db (SQLite)
+
+---
+
 ## [2.0.1] - 2025-10-04 - UI Alignment Update
 
 ### ✏️ Zaktualizowane
