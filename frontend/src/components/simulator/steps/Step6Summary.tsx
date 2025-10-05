@@ -15,6 +15,7 @@ export function Step6Summary() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [calculationId, setCalculationId] = useState<string | null>(null);
+  const [isUsingMockData, setIsUsingMockData] = useState(false);
 
   // Automatyczne wysłanie do API po załadowaniu
   useEffect(() => {
@@ -87,6 +88,7 @@ export function Step6Summary() {
         if (apiError.message === 'Failed to fetch') {
           console.warn("Backend niedostępny, używam mockowych danych");
           // Nie pokazuj błędu, użyj mocków
+          setIsUsingMockData(true);
           const mockResults = {
             nominalPension: "4850.00",
             realPension: "3420.00",
@@ -107,6 +109,7 @@ export function Step6Summary() {
       }
       
       // Zawsze ustaw mockowe wyniki jako fallback
+      setIsUsingMockData(true);
       const mockResults = {
         nominalPension: "4850.00",
         realPension: "3420.00",
@@ -375,7 +378,7 @@ export function Step6Summary() {
           </motion.div>
         )}
 
-        {/* API Info */}
+        {/* API Info lub Mock Data Notice */}
         {calculationId && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -383,6 +386,19 @@ export function Step6Summary() {
             className="text-center text-sm text-[--gray]"
           >
             ID obliczeń: {calculationId}
+          </motion.div>
+        )}
+        
+        {isUsingMockData && !calculationId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-[#FFB34F]/10 border border-[#FFB34F]/30 rounded-xl p-4 text-center"
+          >
+            <div className="text-sm text-[--navy]/70">
+              💡 <strong>Tryb demonstracyjny:</strong> Wyświetlamy przykładowe wyniki. 
+              Backend niedostępny lub w trybie offline.
+            </div>
           </motion.div>
         )}
         </div>
