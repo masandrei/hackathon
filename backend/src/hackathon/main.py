@@ -10,7 +10,8 @@ from sqlalchemy.orm import sessionmaker
 from .schemas import (
     DatabaseItemsResponse, DatabaseItemResponse, HealthCheckResponse, 
     ErrorResponse, StatisticsResponse, StatisticsDataResponse, LifeExpectancyResponse, LifeExpectancyData,
-    CalculationRequest, CalculationResponse
+    CalculationRequest, CalculationResponse, AnalysisResponse, AnalysisErrorResponse,
+    ChatMessage, ChatResponse, ChatErrorResponse, OwlInfoResponse
 )
 from .models import Calculation, Job, Leave
 from .mapper import GROWTH, AVERAGE_WAGE, VALORIZATION, INFLATION, LIFE_EXPECTANCY, LIFE_EXPECTANCY_MALE, LIFE_EXPECTANCY_FEMALE, META
@@ -187,6 +188,83 @@ def submit_calculation(request: CalculationRequest, db: Session = Depends(get_db
     db.commit()
     db.refresh(calculation)
     return CalculationResponse(calculationId=calculation.id)
+
+
+@app.post(
+    "/calculations/analyze",
+    response_model=AnalysisResponse,
+    status_code=200,
+)
+def analyze_calculation(request: CalculationRequest):
+    """Analyze pension calculation with AI-powered insights"""
+    try:
+        from .gemini_client import analyze_pension_from_api_request
+        
+        # Get AI analysis
+        result = analyze_pension_from_api_request(request)
+        
+        if "error" in result:
+            return AnalysisErrorResponse(error=result["error"])
+        
+        return AnalysisResponse(
+            basic_summary=result["basic_summary"],
+            detailed_analysis=result["detailed_analysis"],
+            calculation_data=result["calculation_data"]
+        )
+        
+    except Exception as e:
+        return AnalysisErrorResponse(error=f"Analysis failed: {str(e)}")
+
+
+@app.post(
+    "/chat/owl",
+    response_model=ChatResponse,
+    status_code=200,
+)
+def chat_with_owl_endpoint(message: ChatMessage):
+    """Chat with the owl mascot - ZUŚka (intelligent action detection)"""
+    try:
+        from .gemini_client import chat_with_owl
+        
+        # Get response from owl with intelligent action detection
+        owl_result = chat_with_owl(message.message)
+        
+        return ChatResponse(
+            response=owl_result["response"],
+            timestamp=datetime.now(),
+            action_executed=owl_result.get("action_executed"),
+            action_result=owl_result.get("action_result")
+        )
+        
+    except Exception as e:
+        return ChatErrorResponse(
+            error=f"Hoo hoo! Coś poszło nie tak: {str(e)}",
+            timestamp=datetime.now()
+        )
+
+
+@app.get(
+    "/chat/owl/info",
+    response_model=OwlInfoResponse,
+    status_code=200,
+)
+def get_owl_info():
+    """Get information about the owl mascot"""
+    return OwlInfoResponse(
+        name="ZUŚka",
+        description="Inteligentna maskotka aplikacji do kalkulacji emerytur, ekspert w dziedzinie finansów osobistych i emerytur. Może wykonywać akcje w aplikacji!",
+        personality="Przyjazna, pomocna, zachęcająca, profesjonalna ale nieformalna, czasami używa sówich wyrażeń, może wykonywać polecenia.",
+        capabilities=[
+            "Odpowiadanie na pytania o emerytury",
+            "Wyjaśnianie pojęć finansowych",
+            "Pomoc w korzystaniu z aplikacji",
+            "Motywowanie do planowania emerytury",
+            "Dzielenie się praktycznymi radami",
+            "Wykonywanie akcji: 'oblicz emeryturę', 'pokaż statystyki', 'sprawdź zdrowie'",
+            "Wywoływanie API i skryptów aplikacji"
+        ],
+        greeting="Hoo hoo! Cześć! Jestem ZUŚka, Twoja inteligentna przewodniczka po świecie emerytur! 🦉 Mogę nie tylko odpowiadać na pytania, ale też wykonywać akcje w aplikacji! Skrzydła w górę!"
+    )
 
 
 def main():

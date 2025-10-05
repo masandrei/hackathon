@@ -82,3 +82,40 @@ class CalculationRequest(BaseModel):
 class CalculationResponse(BaseModel):
     calculationId: str
     # Additional fields can be added here as needed
+
+# -------------------------- Analysis Schemas --------------------------
+
+class AnalysisResponse(BaseModel):
+    basic_summary: str
+    detailed_analysis: str
+    calculation_data: Dict
+    success: bool = True
+
+class AnalysisErrorResponse(BaseModel):
+    error: str
+    success: bool = False
+
+# -------------------------- Chat Schemas --------------------------
+
+class ChatMessage(BaseModel):
+    message: str
+    timestamp: Optional[datetime] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    timestamp: datetime
+    success: bool = True
+    action_executed: Optional[str] = None
+    action_result: Optional[Dict] = None
+
+class ChatErrorResponse(BaseModel):
+    error: str
+    timestamp: datetime
+    success: bool = False
+
+class OwlInfoResponse(BaseModel):
+    name: str
+    description: str
+    personality: str
+    capabilities: List[str]
+    greeting: str
