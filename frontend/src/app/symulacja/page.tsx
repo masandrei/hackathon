@@ -125,23 +125,31 @@ function SimulatorContent() {
         </div>
       </main>
 
-      {/* Mobile Bottom Navigation - Optional */}
-      <div className="lg:hidden bg-white border-t border-[--border] p-4">
+      {/* Mobile Bottom Navigation */}
+      <motion.div 
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+        className="lg:hidden bg-white border-t border-[--border] p-4 sticky bottom-0"
+      >
         <div className="flex items-center justify-center gap-2">
-          {[1, 2, 3, 4, 5, 6].map((step) => (
-            <div
+          {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
+            <motion.div
               key={step}
-              className={`h-2 rounded-full transition-all ${
+              className={`h-2 rounded-full transition-all duration-300 ${
                 step === currentStep
                   ? "w-8 bg-[#00993F]"
                   : step < currentStep
                   ? "w-2 bg-[#00993F]/50"
                   : "w-2 bg-[--gray]/30"
               }`}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: step * 0.05, duration: 0.2 }}
             />
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -153,4 +161,3 @@ export default function SimulatorPage() {
     </SimulatorProvider>
   );
 }
-
