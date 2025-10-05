@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { ChartPlaceholder } from "@/components/ChartPlaceholder";
 import { OwlMascot } from "@/components/OwlMascot";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InfoCard } from "@/components/InfoCard";
+import { Footer } from "@/components/Footer";
+import { CookieBanner } from "@/components/CookieBanner";
 import {
   Tooltip,
   TooltipContent,
@@ -14,8 +17,23 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+const highlightStats = [
+  { value: "60s", label: "Czas symulacji" },
+  { value: "3", label: "Rodzaje kwot" },
+  { value: "5", label: "Scenariuszy" },
+  { value: "100%", label: "Edukacyjne" },
+];
+
 export default function Home() {
+  const router = useRouter();
   const [expectedPension, setExpectedPension] = useState("");
+  const [isCookieAccepted, setIsCookieAccepted] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsCookieAccepted(!!window.localStorage.getItem("zus-cookie-consent"));
+    }
+  }, []);
 
   const highlightStats = [
     { value: "60s", label: "Czas symulacji" },
@@ -31,15 +49,17 @@ export default function Home() {
   ];
 
   const formatCurrency = (value: string) => {
-    // Remove non-digits
     const digits = value.replace(/\D/g, "");
-    // Format with space separator
     return digits.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCurrency(e.target.value);
     setExpectedPension(formatted);
+  };
+
+  const handlePolicyClick = () => {
+    router.push("/polityka-cookies");
   };
 
   return (
@@ -228,45 +248,15 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        <footer className="bg-[#00993F] py-12 text-white">
-          <div className="container mx-auto flex max-w-7xl flex-col gap-6 border-t border-white/15 px-4 text-sm sm:px-6 sm:text-base lg:px-8 lg:flex-row lg:items-center lg:justify-between">
-            <p className="font-medium text-white/90">
-              © 2025 ZUS Symulator Emerytalny. Narzędzie edukacyjne.
-            </p>
-            <nav className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 font-semibold text-white">
-              {footerLinks.map((link) => (
-                <a key={link.label} href={link.href} className="transition-opacity hover:opacity-80">
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/70 sm:text-sm">
-              Wersja danych: 2025-01-15 | Model v1.0
-            </p>
-          </div>
-        </footer>
-
-        {/* Cookie Banner */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#002911] text-white">
-          <div className="mx-auto flex h-[82px] w-full max-w-6xl items-center justify-between gap-6 px-4 sm:px-8 text-sm sm:text-base">
-            <p className="flex-1 min-w-0 text-balance font-medium leading-tight text-white/90">
-              Ta strona używa plików cookies, by symulator działał sprawnie i byśmy mogli go ulepszać. Kontynuując, zgadzasz się na ich użycie.
-            </p>
-            <div className="flex flex-shrink-0 items-center gap-3">
-              <Button className="h-10 rounded-[4px] bg-[#1f3829] px-5 text-sm font-medium text-white hover:bg-[#1f3829]/80 sm:text-base">
-                Ustawienia
-              </Button>
-              <Button className="h-10 rounded-[4px] bg-[#1f3829] px-5 text-sm font-medium text-white hover:bg-[#1f3829]/80 sm:text-base">
-                Akceptuję
-              </Button>
-              <button className="text-sm font-medium underline decoration-white/60 underline-offset-4 hover:opacity-80 sm:text-base">
-                Polityka cookies
-              </button>
-            </div>
-          </div>
-        </div>
       </main>
+
+      <Footer />
+      {!isCookieAccepted && (
+        <CookieBanner
+          onAccept={() => setIsCookieAccepted(true)}
+          onPolicy={() => router.push("/polityka-cookies")}
+        />
+      )}
     </div>
   );
 }
