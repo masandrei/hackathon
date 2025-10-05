@@ -65,17 +65,17 @@ export function Step6Summary() {
         
         console.log("Odpowiedź z API:", response);
         
-        if (response && response.id) {
-          setCalculationId(response.id);
+        if (response && response.calculationId) {
+          setCalculationId(response.calculationId);
           
-          // Mock results - w przyszłości pobierz z GET /calculations/{id}
-          const mockResults = {
-            nominalPension: "4850.00",
-            realPension: "3420.00",
-            percentageToAverage: 89,
+          // Use calculated results from API
+          const calculatedResults = {
+            nominalPension: response.nominalPension || "0.00",
+            realPension: response.realPension || "0.00",
+            percentageToAverage: response.replacementRate || 0,
           };
           
-          setResults(mockResults);
+          setResults(calculatedResults);
         }
       } catch (apiError: unknown) {
         clearTimeout(timeoutId);

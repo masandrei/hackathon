@@ -3,6 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export type CalculationResponse = {
-    pension?: string;
+    calculationId: string;
+    nominalPension?: string;
+    realPension?: string;
+    replacementRate?: number;
+    averageWage?: number;
 };
 

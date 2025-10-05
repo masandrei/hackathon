@@ -1,5 +1,5 @@
-from models import Calculation, Leave, Sex
-from mapper import GROWTH, VALORIZATION, AVERAGE_WAGE, INFLATION, LIFE_EXPECTANCY, EXPECTED_ABSENCE_FEMALE, EXPECTED_ABSENCE_MALE
+from .models import Calculation, Leave, Sex
+from .mapper import GROWTH, VALORIZATION, AVERAGE_WAGE, INFLATION, LIFE_EXPECTANCY, EXPECTED_ABSENCE_FEMALE, EXPECTED_ABSENCE_MALE
 from datetime import datetime
 
 TAU = 0.196
