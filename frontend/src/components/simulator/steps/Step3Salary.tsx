@@ -92,10 +92,10 @@ export function Step3Salary() {
               inputMode="numeric"
               value={salary}
               onChange={handleInputChange}
-              className="h-20 rounded-2xl border-2 border-[#bec3ce] pr-28 text-xl font-bold text-[--ink] text-center transition-all placeholder:text-[#b5bbc2] hover:border-[#ffb34f] hover:ring-4 hover:ring-[#ffb34f]/25 focus:border-[#ffb34f] focus:outline-none focus:ring-4 focus:ring-[#ffb34f]/30"
+              className="h-20 rounded-2xl border-2 border-[#bec3ce] pr-28 text-4xl font-bold text-[--ink] text-center transition-all placeholder:text-[#b5bbc2] hover:border-[#ffb34f] hover:ring-4 hover:ring-[#ffb34f]/25 focus:border-[#ffb34f] focus:outline-none focus:ring-4 focus:ring-[#ffb34f]/30"
               placeholder="0"
             />
-            <div className="pointer-events-none absolute inset-y-0 right-6 flex items-center text-xl font-bold text-[#bec3ce]">
+            <div className="pointer-events-none absolute inset-y-0 right-6 flex items-center text-3xl font-bold text-[#bec3ce]">
               zł
             </div>
           </div>

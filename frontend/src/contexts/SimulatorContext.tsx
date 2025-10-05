@@ -46,6 +46,7 @@ interface SimulatorContextType {
   totalSteps: number;
   data: SimulatorData;
   results: SimulatorResults | null;
+  completedSteps: Set<number>;
   setCurrentStep: (step: number) => void;
   updateData: (newData: Partial<SimulatorData>) => void;
   setResults: (results: SimulatorResults) => void;
@@ -53,6 +54,7 @@ interface SimulatorContextType {
   prevStep: () => void;
   goToStep: (step: number) => void;
   resetSimulator: () => void;
+  markStepCompleted: (step: number) => void;
 }
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(
@@ -63,6 +65,7 @@ export function SimulatorProvider({ children }: { children: ReactNode }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<SimulatorData>({});
   const [results, setResults] = useState<SimulatorResults | null>(null);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   
   // Dynamiczne obliczanie liczby kroków
   const totalSteps = useMemo(() => {
@@ -87,8 +90,15 @@ export function SimulatorProvider({ children }: { children: ReactNode }) {
     setData((prev) => ({ ...prev, ...newData }));
   };
 
+  const markStepCompleted = (step: number) => {
+    setCompletedSteps((prev) => new Set(prev).add(step));
+  };
+
   const nextStep = () => {
     console.log('SimulatorContext: nextStep wywołany', { currentStep, totalSteps });
+    // Oznacz obecny krok jako ukończony
+    markStepCompleted(currentStep);
+    
     if (currentStep < totalSteps) {
       const nextStepNum = currentStep + 1;
       console.log('SimulatorContext: ustawiam krok na', nextStepNum);
@@ -105,7 +115,13 @@ export function SimulatorProvider({ children }: { children: ReactNode }) {
   };
 
   const goToStep = (step: number) => {
-    if (step >= 1 && step <= totalSteps) {
+    // Możesz przejść do kroku tylko jeśli:
+    // 1. Jest to obecny krok
+    // 2. Jest to ukończony krok
+    // 3. Jest to następny krok po ostatnim ukończonym
+    const maxAccessibleStep = Math.max(...Array.from(completedSteps), currentStep) + 1;
+    
+    if (step >= 1 && step <= totalSteps && step <= maxAccessibleStep) {
       setCurrentStep(step);
     }
   };
@@ -114,6 +130,7 @@ export function SimulatorProvider({ children }: { children: ReactNode }) {
     setCurrentStep(1);
     setData({});
     setResults(null);
+    setCompletedSteps(new Set());
   };
 
   return (
@@ -123,6 +140,7 @@ export function SimulatorProvider({ children }: { children: ReactNode }) {
         totalSteps,
         data,
         results,
+        completedSteps,
         setCurrentStep,
         updateData,
         setResults,
@@ -130,6 +148,7 @@ export function SimulatorProvider({ children }: { children: ReactNode }) {
         prevStep,
         goToStep,
         resetSimulator,
+        markStepCompleted,
       }}
     >
       {children}
