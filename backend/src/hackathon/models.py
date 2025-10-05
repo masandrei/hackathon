@@ -5,12 +5,6 @@ import uuid
 
 Base = declarative_base()
 
-# Example SQLAlchemy model for Alembic
-class Item(Base):
-    __tablename__ = "items"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-
 class Calculation(Base):
     __tablename__ = "calculations"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
