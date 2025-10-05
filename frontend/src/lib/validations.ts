@@ -22,7 +22,7 @@ export const jobSchema = z.object({
 export const simulatorDataSchema = z.object({
   age: z.number().min(18, "Minimalny wiek to 18 lat").max(66, "Maksymalny wiek to 66 lat"),
   sex: z.enum(["male", "female"], {
-    errorMap: () => ({ message: "Wybierz płeć" })
+    message: "Wybierz płeć"
   }),
   salary: z.string().min(1, "Podaj wynagrodzenie").refine((val) => {
     const num = Number(val.replace(/\s/g, ""));
@@ -54,7 +54,7 @@ export type JobFormData = z.infer<typeof jobSchema>;
 export type SimulatorFormData = z.infer<typeof simulatorDataSchema>;
 
 // Funkcja walidująca krok po kroku
-export function validateStep(step: number, data: Record<string, unknown>): { valid: boolean; errors?: string[] } {
+export function validateStep(step: number, data: Partial<SimulatorFormData>): { valid: boolean; errors?: string[] } {
   const errors: string[] = [];
   
   switch (step) {
