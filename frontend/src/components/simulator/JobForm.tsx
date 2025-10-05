@@ -15,9 +15,10 @@ interface JobFormProps {
 }
 
 export function JobForm({ job, onSave, onCancel }: JobFormProps) {
-  const [formData, setFormData] = useState<Job>(
+  // Użyj useState z funkcją initializer aby uniknąć problemów z SSR
+  const [formData, setFormData] = useState<Job>(() => 
     job || {
-      id: `job-${Date.now()}`,
+      id: `job-${Math.random().toString(36).substring(2, 11)}`,
       startDate: "",
       endDate: "",
       baseSalary: 0,

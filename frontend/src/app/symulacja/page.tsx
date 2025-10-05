@@ -23,40 +23,29 @@ function SimulatorContent() {
   const router = useRouter();
 
   const renderStep = () => {
-    // Dynamiczne mapowanie kroków na podstawie wyboru użytkownika
-    let stepCounter = 1;
+    // Stała mapa kroków
+    const stepMap = [
+      <Step2Sex key="sex" />,              // 1. Płeć
+      <Step1Age key="age" />,              // 2. Wiek
+      <Step3Salary key="salary" />,        // 3. Wynagrodzenie
+      <Step4CareerStart key="career" />,   // 4. Początek kariery
+      <Step4aJobHistory key="jobChoice" />, // 5. Historia zatrudnienia - wybór
+    ];
     
-    // Krok 1: Płeć
-    if (currentStep === stepCounter++) return <Step2Sex />;
-    
-    // Krok 2: Wiek
-    if (currentStep === stepCounter++) return <Step1Age />;
-    
-    // Krok 3: Wynagrodzenie
-    if (currentStep === stepCounter++) return <Step3Salary />;
-    
-    // Krok 4: Początek kariery
-    if (currentStep === stepCounter++) return <Step4CareerStart />;
-    
-    // Krok 4a: Historia zatrudnienia - wybór
-    if (currentStep === stepCounter++) return <Step4aJobHistory />;
-    
-    // Krok 4b: Zarządzanie pracami (tylko jeśli wybrano "tak")
-    if (data.includeJobHistory && currentStep === stepCounter++) {
-      return <Step4bJobsManager />;
+    // Dodaj Step4b tylko jeśli wybrano historię
+    if (data.includeJobHistory) {
+      stepMap.push(<Step4bJobsManager key="jobs" />); // 6. Zarządzanie pracami
     }
     
-    // Krok 5: Chorobowe
-    if (currentStep === stepCounter++) return <Step5SickLeave />;
+    // Dodaj pozostałe kroki
+    stepMap.push(
+      <Step5SickLeave key="sickLeave" />,      // 6 lub 7. Chorobowe
+      <Step5Retirement key="retirement" />,    // 7 lub 8. Rok emerytury
+      <Step6Summary key="summary" />           // 8 lub 9. Podsumowanie
+    );
     
-    // Krok 6: Rok emerytury
-    if (currentStep === stepCounter++) return <Step5Retirement />;
-    
-    // Krok 7: Podsumowanie
-    if (currentStep === stepCounter++) return <Step6Summary />;
-    
-    // Default
-    return <Step2Sex />;
+    // Zwróć odpowiedni krok (currentStep jest 1-indexed)
+    return stepMap[currentStep - 1] || <Step2Sex key="default" />;
   };
 
   return (
