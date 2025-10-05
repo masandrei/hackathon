@@ -30,9 +30,25 @@ class CalculationResponse(BaseModel):
     real_monthly_pension: float
     average_wage: float
 
+class LeaveType(Enum):
+    MATERNITY = "MATERNITY"
+    PATERNITY = "PATERNITY"
+    SICKNESS = "SICKNESS"
+    DEFAULT = "DEFAULT"
+    ACCIDENT = "ACCIDENT"
+    UNPAID = "UNPAID"
+
 class Leave(BaseModel):
     duration_days: int
     leave_year: int
+    leave_type: LeaveType
+    def get_multiplier(self) -> float:
+        if self.leave_type in [LeaveType.MATERNITY, LeaveType.PATERNITY, LeaveType.ACCIDENT]:
+            return 0.098
+        elif self.leave_type in [LeaveType.DEFAULT]:
+            return 0.196
+        else:
+            return 0.098
 
 
 class Job(BaseModel):

@@ -53,8 +53,8 @@ def compute_pension_funds(calc: Calculation):
             for leave in calc.leaves:
                 if leave.leave_year == i:
                     effective_days -= leave.duration_days
-            total_sum_under_taxes = min(12 * get_salary(job.base_salary, job.start_date, i) * effective_days / total_days, AVG_SALARIES_PER_YEAR_THRESHOLD * AVERAGE_WAGE[i])
-            total_funds = total_funds + total_sum_under_taxes * TAU
+            total_sum_under_taxes = min(12 * get_salary(job.base_salary, job.start_date, i) * (effective_days / total_days * TAU + (total_days - effective_days) / total_days * leave.get_multiplier()), AVG_SALARIES_PER_YEAR_THRESHOLD * AVERAGE_WAGE[i])
+            total_funds = total_funds + total_sum_under_taxes
             total_funds = total_funds * (1 + VALORIZATION[i])
     
     inflation=get_inflation(start_year, datetime.now().year)
