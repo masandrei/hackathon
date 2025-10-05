@@ -423,5 +423,34 @@ def test_with_api_request():
     except Exception as e:
         print(f"Błąd: {str(e)}")
 
+def chat_with_owl(message: str) -> str:
+    """Chat with the owl mascot using Gemini"""
+    try:
+        configure_gemini()
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        
+        owl_prompt = f"""
+        Jesteś sympatyczną sową-maskotką aplikacji do kalkulacji emerytur. 
+        Twoje imię to "Sowa Mądra" i jesteś ekspertem w dziedzinie emerytur i finansów osobistych.
+        
+        Oto wiadomość od użytkownika: "{message}"
+        
+        Odpowiedz jako przyjazna sowa, która:
+        1. Używa prostego, zrozumiałego języka
+        2. Jest pomocna i zachęcająca
+        3. Może odpowiadać na pytania o emerytury, finanse, aplikację
+        4. Czasami używa sówich wyrażeń jak "Hoo hoo!" lub "Skrzydła w górę!"
+        5. Jest profesjonalna, ale nieformalna
+        6. Zawsze kończy zachęcając do korzystania z aplikacji
+        
+        Odpowiedz krótko (maksymalnie 3-4 zdania) i przyjaźnie.
+        """
+        
+        response = model.generate_content(owl_prompt)
+        return response.text
+        
+    except Exception as e:
+        return f"Hoo hoo! Przepraszam, ale mam problem z połączeniem. Spróbuj ponownie za chwilę! 🦉"
+
 if __name__ == "__main__":
     main()

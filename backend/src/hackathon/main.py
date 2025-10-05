@@ -10,7 +10,8 @@ from sqlalchemy.orm import sessionmaker
 from .schemas import (
     DatabaseItemsResponse, DatabaseItemResponse, HealthCheckResponse, 
     ErrorResponse, StatisticsResponse, StatisticsDataResponse, LifeExpectancyResponse, LifeExpectancyData,
-    CalculationRequest, CalculationResponse, AnalysisResponse, AnalysisErrorResponse
+    CalculationRequest, CalculationResponse, AnalysisResponse, AnalysisErrorResponse,
+    ChatMessage, ChatResponse, ChatErrorResponse, OwlInfoResponse
 )
 from .models import Calculation, Job, Leave
 from .mapper import GROWTH, AVERAGE_WAGE, VALORIZATION, INFLATION, LIFE_EXPECTANCY, LIFE_EXPECTANCY_MALE, LIFE_EXPECTANCY_FEMALE, META
@@ -213,6 +214,53 @@ def analyze_calculation(request: CalculationRequest):
         
     except Exception as e:
         return AnalysisErrorResponse(error=f"Analysis failed: {str(e)}")
+
+
+@app.post(
+    "/chat/owl",
+    response_model=ChatResponse,
+    status_code=200,
+)
+def chat_with_owl_endpoint(message: ChatMessage):
+    """Chat with the owl mascot - Sowa Mądra"""
+    try:
+        from .gemini_client import chat_with_owl
+        
+        # Get response from owl
+        owl_response = chat_with_owl(message.message)
+        
+        return ChatResponse(
+            response=owl_response,
+            timestamp=datetime.now()
+        )
+        
+    except Exception as e:
+        return ChatErrorResponse(
+            error=f"Hoo hoo! Coś poszło nie tak: {str(e)}",
+            timestamp=datetime.now()
+        )
+
+
+@app.get(
+    "/chat/owl/info",
+    response_model=OwlInfoResponse,
+    status_code=200,
+)
+def get_owl_info():
+    """Get information about the owl mascot"""
+    return OwlInfoResponse(
+        name="Sowa Mądra",
+        description="Przyjazna maskotka aplikacji do kalkulacji emerytur, ekspert w dziedzinie finansów osobistych i emerytur.",
+        personality="Przyjazna, pomocna, zachęcająca, profesjonalna ale nieformalna, czasami używa sówich wyrażeń.",
+        capabilities=[
+            "Odpowiadanie na pytania o emerytury",
+            "Wyjaśnianie pojęć finansowych",
+            "Pomoc w korzystaniu z aplikacji",
+            "Motywowanie do planowania emerytury",
+            "Dzielenie się praktycznymi radami"
+        ],
+        greeting="Hoo hoo! Cześć! Jestem Sowa Mądra, Twoja przewodniczka po świecie emerytur! 🦉 Skrzydła w górę i zapraszam do rozmowy!"
+    )
 
 
 def main():

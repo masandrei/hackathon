@@ -94,3 +94,26 @@ class AnalysisResponse(BaseModel):
 class AnalysisErrorResponse(BaseModel):
     error: str
     success: bool = False
+
+# -------------------------- Chat Schemas --------------------------
+
+class ChatMessage(BaseModel):
+    message: str
+    timestamp: Optional[datetime] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    timestamp: datetime
+    success: bool = True
+
+class ChatErrorResponse(BaseModel):
+    error: str
+    timestamp: datetime
+    success: bool = False
+
+class OwlInfoResponse(BaseModel):
+    name: str
+    description: str
+    personality: str
+    capabilities: List[str]
+    greeting: str
