@@ -213,7 +213,7 @@
         }
       }
     },
-    "/calculations/download": {
+    "/calculations/export": {
       "get": {
         "operationId": "downloadAllCalculations",
         "tags": [

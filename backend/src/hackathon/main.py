@@ -1,17 +1,21 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import aiosqlite
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
+import io
+import pandas as pd
 from .schemas import (
     DatabaseItemsResponse, DatabaseItemResponse, HealthCheckResponse, 
     ErrorResponse, StatisticsResponse, StatisticsDataResponse, LifeExpectancyResponse, LifeExpectancyData,
     CalculationRequest, CalculationResponse, AnalysisResponse, AnalysisErrorResponse,
-    ChatMessage, ChatResponse, ChatErrorResponse, OwlInfoResponse
+    ChatMessage, ChatResponse, ChatErrorResponse, OwlInfoResponse,
+    CalculationDetail, CalculationAdminDetail, PaginatedCalculationsResponse
 )
 from .models import Calculation, Job, Leave
 from .mapper import GROWTH, AVERAGE_WAGE, VALORIZATION, INFLATION, LIFE_EXPECTANCY, LIFE_EXPECTANCY_MALE, LIFE_EXPECTANCY_FEMALE, META
@@ -19,6 +23,16 @@ import uuid
 import os
 
 app = FastAPI(title="Hackathon API")
+
+# Enable CORS for all origins for development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///hackathon.db")
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
@@ -124,6 +138,173 @@ async def global_exception_handler(request, exc):
             timestamp=datetime.now()
         ).dict()
     )
+
+
+@app.get(
+    "/calculations",
+    response_model=PaginatedCalculationsResponse,
+    status_code=200,
+)
+def list_calculations(
+    page: int = Query(1, ge=1, description="Page number (starting from 1)"),
+    limit: int = Query(20, ge=1, le=100, description="Number of items per page"),
+    db: Session = Depends(get_db)
+):
+    """List all submitted calculations with pagination"""
+    try:
+        # Calculate offset
+        offset = (page - 1) * limit
+        
+        # Get total count
+        total_items = db.query(Calculation).count()
+        
+        # Get calculations with pagination
+        calculations = db.query(Calculation).offset(offset).limit(limit).all()
+        
+        # Convert to response format
+        submissions = []
+        for calc in calculations:
+            # Parse timestamp
+            timestamp_parts = calc.calculation_timestamp.split('T')
+            calc_date = timestamp_parts[0] if len(timestamp_parts) > 0 else ""
+            calc_time = timestamp_parts[1] if len(timestamp_parts) > 1 else ""
+            
+            submission = CalculationAdminDetail(
+                calculationId=calc.id,
+                calculationDate=calc_date,
+                calculationTime=calc_time,
+                expectedPension=calc.expected_pension,
+                age=calc.age,
+                sex=calc.sex,
+                salary=calc.salary,
+                isSickLeaveIncluded=calc.is_sick_leave_included,
+                totalAccumulatedFunds=calc.total_accumulated_funds,
+                yearWorkStart=calc.year_work_start,
+                yearDesiredRetirement=calc.year_desired_retirement,
+                postalCode=calc.postal_code,
+                nominalPension=None,  # These would need to be calculated
+                realPension=None      # These would need to be calculated
+            )
+            submissions.append(submission)
+        
+        # Calculate total pages
+        total_pages = (total_items + limit - 1) // limit
+        
+        return PaginatedCalculationsResponse(
+            submissions=submissions,
+            page=page,
+            pageSize=limit,
+            totalItems=total_items,
+            totalPages=total_pages
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving calculations: {str(e)}")
+
+
+@app.get(
+    "/calculations/export",
+    status_code=200,
+)
+def download_all_calculations(
+    lang: str = Query("pl-PL", description="Language for the exported file"),
+    db: Session = Depends(get_db)
+):
+    """Download all submitted calculations in XLS format"""
+    try:
+        # Get all calculations
+        calculations = db.query(Calculation).all()
+        
+        if not calculations:
+            # Return empty XLS file
+            df = pd.DataFrame(columns=[
+                'ID Obliczenia', 'Data', 'Czas', 'Wiek', 'Płeć', 'Pensja', 
+                'Oczekiwana Emerytura', 'Składki Chorobowe', 'Zgromadzone Środki',
+                'Rok Rozpoczęcia Pracy', 'Rok Planowanej Emerytury', 'Kod Pocztowy'
+            ])
+        else:
+            # Prepare data for export
+            data = []
+            for calc in calculations:
+                # Parse timestamp
+                timestamp_parts = calc.calculation_timestamp.split('T')
+                calc_date = timestamp_parts[0] if len(timestamp_parts) > 0 else ""
+                calc_time = timestamp_parts[1] if len(timestamp_parts) > 1 else ""
+                
+                data.append({
+                    'ID Obliczenia': calc.id,
+                    'Data': calc_date,
+                    'Czas': calc_time,
+                    'Wiek': calc.age,
+                    'Płeć': 'Kobieta' if calc.sex == 'female' else 'Mężczyzna',
+                    'Pensja': calc.salary,
+                    'Oczekiwana Emerytura': calc.expected_pension,
+                    'Składki Chorobowe': 'Tak' if calc.is_sick_leave_included else 'Nie',
+                    'Zgromadzone Środki': calc.total_accumulated_funds,
+                    'Rok Rozpoczęcia Pracy': calc.year_work_start,
+                    'Rok Planowanej Emerytury': calc.year_desired_retirement,
+                    'Kod Pocztowy': calc.postal_code or ''
+                })
+            
+            df = pd.DataFrame(data)
+        
+        # Create XLS file in memory
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, sheet_name='Obliczenia Emerytur', index=False)
+        output.seek(0)
+        # Use StreamingResponse for file download
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f"attachment; filename=obliczenia-emerytur-{datetime.now().strftime('%Y-%m-%d')}.xlsx"
+            }
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating XLS file: {str(e)}")
+
+
+@app.get(
+    "/calculations/{calculation_id}",
+    response_model=CalculationDetail,
+    status_code=200,
+)
+def get_calculation_by_id(calculation_id: str, db: Session = Depends(get_db)):
+    """Get detailed calculation by ID"""
+    try:
+        calculation = db.query(Calculation).filter(Calculation.id == calculation_id).first()
+        
+        if not calculation:
+            raise HTTPException(status_code=404, detail="Calculation not found")
+        
+        # Parse timestamp
+        timestamp_parts = calculation.calculation_timestamp.split('T')
+        calc_date = timestamp_parts[0] if len(timestamp_parts) > 0 else ""
+        calc_time = timestamp_parts[1] if len(timestamp_parts) > 1 else ""
+        
+        return CalculationDetail(
+            calculationId=calculation.id,
+            calculationDate=calc_date,
+            calculationTime=calc_time,
+            expectedPension=calculation.expected_pension,
+            age=calculation.age,
+            sex=calculation.sex,
+            salary=calculation.salary,
+            isSickLeaveIncluded=calculation.is_sick_leave_included,
+            totalAccumulatedFunds=calculation.total_accumulated_funds,
+            yearWorkStart=calculation.year_work_start,
+            yearDesiredRetirement=calculation.year_desired_retirement,
+            postalCode=calculation.postal_code,
+            nominalPension=None,  # These would need to be calculated
+            realPension=None      # These would need to be calculated
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving calculation: {str(e)}")
 
 
 @app.post(
