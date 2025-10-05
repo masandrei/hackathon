@@ -100,3 +100,12 @@ npx openapi-typescript-codegen --input ../openapi.json --output ./src/api-client
 ### Back-end
 
 Dev URL: http://localhost:8000
+
+#### Database
+
+After changes in schema, perform migration by these two commands:
+
+```bash
+alembic revision --autogenerate -m "<summary of migration>"
+alembic upgrade head
+```
