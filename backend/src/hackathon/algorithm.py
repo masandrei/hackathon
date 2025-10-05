@@ -64,8 +64,4 @@ def compute_pension_funds(calc: Calculation):
 
 def compute_montly_pension(available_funds: (float, float), age: int):
     (nominal, real) = available_funds
-<<<<<<< Updated upstream
     return {"nominal": nominal / LIFE_EXPECTANCY[age], "real": real / LIFE_EXPECTANCY[age]}
-=======
-    return {"nominal": nominal / LIFE_EXPECTANCY[age], "real": real / LIFE_EXPECTANCY[age]}
->>>>>>> Stashed changes
