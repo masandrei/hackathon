@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 from __future__ import annotations
 
 from fastapi import FastAPI, Depends, HTTPException
@@ -63,7 +62,7 @@ async def get_statistics():
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error loading statistics: {str(e)}")
-=======
+
 import uuid
 from fastapi import FastAPI
 from hackathon.mapper import AVERAGE_WAGE
@@ -77,13 +76,11 @@ app = FastAPI(title="Hackathon API")
 @app.get("/")
 def root():
     return {"message": "Hello from Hackathon!"}
->>>>>>> Stashed changes
 
 @app.get("/statistics/growth-rate", response_model=List[StatisticsDataResponse])
 async def get_growth_rate():
     return [StatisticsDataResponse(year=y, value=v) for y, v in GROWTH.items()]
 
-<<<<<<< Updated upstream
 @app.get("/statistics/average-wage", response_model=List[StatisticsDataResponse])
 async def get_average_wage():
     return [StatisticsDataResponse(year=y, value=v) for y, v in AVERAGE_WAGE.items()]
@@ -218,13 +215,11 @@ def get_owl_info():
         greeting="Hoo hoo! Cześć! Jestem ZUŚka, Twoja inteligentna przewodniczka po świecie emerytur! 🦉 Mogę nie tylko odpowiadać na pytania, ale też wykonywać akcje w aplikacji! Skrzydła w górę!"
     )
 
-# --- Entrypoint ---
 def main():
     uvicorn.run("hackathon.main:app", host="127.0.0.1", port=8000, reload=True)
 
 if __name__ == "__main__":
     main()
-=======
 @app.post("/calculations")
 def create_calculation(calculation: CalculationRequest):
     calc = Calculation(**calculation, calculation_id=uuid.uuid4(), calculation_datetime=datetime.now())
@@ -242,8 +237,3 @@ def create_calculation(calculation: CalculationRequest):
                                                                                                             year <= calc.year_desired_retirement},
                                 avg_salaries=avg_salaries,
                                 replacement_rate=monthly_pension["nominal"] / AVERAGE_WAGE[calc.year_desired_retirement])
-
-
-def main():
-    uvicorn.run("hackathon.main:app", host="127.0.0.1", port=8000, reload=True, app_dir="src")
->>>>>>> Stashed changes
