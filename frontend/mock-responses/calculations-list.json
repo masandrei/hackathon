@@ -1,0 +1,22 @@
+{
+    "submissions": [
+        {
+            "calculationId": "b3e1a7e2-8c2d-4e6a-9f1a-2b7c3e4d5f6a",
+            "calculationDate": "2025-10-04",
+            "calculationTime": "08:15:30Z",
+            "expectedPension": "2450.75",
+            "age": 42,
+            "sex": "female",
+            "salary": "5200.00",
+            "isSickLeaveIncluded": true,
+            "totalAccumulatedFunds": "150000.00",
+            "nominalPension": "2600.00",
+            "realPension": "2400.00",
+            "postalCode": "00-950"
+        }
+    ],
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 1,
+    "totalPages": 1
+}

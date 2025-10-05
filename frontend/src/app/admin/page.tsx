@@ -40,21 +40,25 @@ export default function AdminPanel() {
         totalItems: 0,
         totalPages: 0
     });
+    const [useMock, setUseMock] = useState(false);
 
     const fetchCalculations = async (page: number = 1, limit: number = 20) => {
         try {
             setLoading(true);
             setError(null);
 
-            const response = await fetch(`http://localhost:8000/calculations?page=${page}&limit=${limit}`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            let data: PaginatedCalculationsResponse;
+            if (useMock) {
+                const res = await fetch('/mock-responses/calculations-list.json');
+                data = await res.json();
+            } else {
+                const response = await fetch(`http://localhost:8000/calculations?page=${page}&limit=${limit}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                data = await response.json();
             }
 
-            const data: PaginatedCalculationsResponse = await response.json();
-
-            // Handle empty list case - this is a valid 200 OK response
             setCalculations(data.submissions || []);
             setPagination({
                 page: data.page || 1,
@@ -85,7 +89,7 @@ export default function AdminPanel() {
 
     useEffect(() => {
         fetchCalculations();
-    }, []);
+    }, [useMock]);
 
     const formatCurrency = (value: string) => {
         const num = parseFloat(value);
@@ -105,6 +109,24 @@ export default function AdminPanel() {
 
     const handlePageChange = (newPage: number) => {
         fetchCalculations(newPage, pagination.pageSize);
+    };
+
+    // Pagination controls
+    const renderPagination = () => {
+        if (pagination.totalPages <= 1) return null;
+        const pages = [];
+        for (let i = 1; i <= pagination.totalPages; i++) {
+            pages.push(
+                <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`px-2 py-1 mx-1 rounded ${pagination.page === i ? 'bg-primary text-white' : 'bg-gray-200'}`}
+                >
+                    {i}
+                </button>
+            );
+        }
+        return <div className="my-4 flex justify-center">{pages}</div>;
     };
 
     const downloadReport = async () => {
@@ -142,7 +164,17 @@ export default function AdminPanel() {
     return (
         <div className="min-h-screen flex flex-col bg-background">
             <Header />
-
+            <div className="p-4">
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={useMock}
+                        onChange={e => setUseMock(e.target.checked)}
+                        style={{ marginRight: '8px' }}
+                    />
+                    Użyj mockowanych danych
+                </label>
+            </div>
             <main className="flex-1">
                 {/* Header Section */}
                 <section className="bg-gradient-to-br from-[#00993F] to-[#00416E] py-16 text-white">
@@ -175,7 +207,7 @@ export default function AdminPanel() {
                 <section className="py-16">
                     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         {/* Stats Cards */}
-                        <div className="grid gap-6 md:grid-cols-4 mb-8">
+                        <div className="grid gap-6 md:grid-cols-3 mb-8">
                             <Card className="p-6 bg-gradient-to-r from-[#00993F]/10 to-[#00416E]/10 border-[#00993F]/20">
                                 <div className="text-center">
                                     <div className="text-3xl font-bold text-[#00993F] mb-2">
@@ -198,14 +230,6 @@ export default function AdminPanel() {
                                         {calculations.filter(c => c.sex === 'male').length}
                                     </div>
                                     <div className="text-sm text-gray-600">Mężczyźni</div>
-                                </div>
-                            </Card>
-                            <Card className="p-6 bg-gradient-to-r from-[#00993F]/10 to-[#00416E]/10 border-[#00993F]/20">
-                                <div className="text-center">
-                                    <div className="text-3xl font-bold text-[#00993F] mb-2">
-                                        {pagination.pageSize}
-                                    </div>
-                                    <div className="text-sm text-gray-600">Na stronę</div>
                                 </div>
                             </Card>
                         </div>
@@ -271,7 +295,6 @@ export default function AdminPanel() {
                                                     <th className="px-6 py-4 text-left text-sm font-semibold">Pensja</th>
                                                     <th className="px-6 py-4 text-left text-sm font-semibold">Oczekiwana emerytura</th>
                                                     <th className="px-6 py-4 text-left text-sm font-semibold">Kod pocztowy</th>
-                                                    <th className="px-6 py-4 text-left text-sm font-semibold">Akcje</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200">
@@ -302,19 +325,6 @@ export default function AdminPanel() {
                                                         <td className="px-6 py-4 text-sm text-gray-600">
                                                             {calc.postalCode || '-'}
                                                         </td>
-                                                        <td className="px-6 py-4 text-sm">
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="border-[#00993F] text-[#00993F] hover:bg-[#00993F] hover:text-white"
-                                                                onClick={() => {
-                                                                    // Navigate to calculation details page
-                                                                    window.open(`/calculations/${calc.calculationId}`, '_blank');
-                                                                }}
-                                                            >
-                                                                Szczegóły
-                                                            </Button>
-                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -322,26 +332,43 @@ export default function AdminPanel() {
                                     </div>
                                 </Card>
 
-                                {/* Pagination */}
-                                {pagination.totalPages > 1 && (
-                                    <div className="mt-8 flex items-center justify-between">
-                                        <div className="text-sm text-gray-600">
-                                            Strona {pagination.page} z {pagination.totalPages}
-                                            ({pagination.totalItems} obliczeń)
-                                        </div>
+                                <div className="mt-8 flex flex-col items-center justify-center w-full">
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={pagination.page === 1}
+                                            onClick={() => handlePageChange(pagination.page - 1)}
+                                        >
+                                            Poprzednia
+                                        </Button>
 
-                                        <div className="flex items-center gap-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                disabled={pagination.page === 1}
-                                                onClick={() => handlePageChange(pagination.page - 1)}
-                                            >
-                                                Poprzednia
-                                            </Button>
-
-                                            <div className="flex items-center gap-1">
-                                                {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                                        <div className="flex items-center gap-1">
+                                            {pagination.totalPages > 3 ? (
+                                                <>
+                                                    {Array.from({ length: 3 }, (_, i) => {
+                                                        const pageNum = i + 1;
+                                                        return (
+                                                            <Button
+                                                                key={pageNum}
+                                                                variant={pageNum === pagination.page ? "default" : "outline"}
+                                                                size="sm"
+                                                                className={pageNum === pagination.page ? "bg-[#00993F] text-white" : ""}
+                                                                onClick={() => handlePageChange(pageNum)}
+                                                            >
+                                                                {pageNum}
+                                                            </Button>
+                                                        );
+                                                    })}
+                                                    <span className="mx-2 flex items-center text-gray-500">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M4 12h16M12 4v16" stroke="#00993F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                        </svg>
+                                                        <span className="ml-1">{pagination.totalPages}</span>
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                Array.from({ length: Math.max(2, pagination.totalPages) }, (_, i) => {
                                                     const pageNum = i + 1;
                                                     return (
                                                         <Button
@@ -354,20 +381,20 @@ export default function AdminPanel() {
                                                             {pageNum}
                                                         </Button>
                                                     );
-                                                })}
-                                            </div>
-
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                disabled={pagination.page === pagination.totalPages}
-                                                onClick={() => handlePageChange(pagination.page + 1)}
-                                            >
-                                                Następna
-                                            </Button>
+                                                })
+                                            )}
                                         </div>
+
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={pagination.page === pagination.totalPages}
+                                            onClick={() => handlePageChange(pagination.page + 1)}
+                                        >
+                                            Następna
+                                        </Button>
                                     </div>
-                                )}
+                                </div>
                             </>
                         )}
                     </div>
