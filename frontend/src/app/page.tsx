@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { ChartPlaceholder } from "@/components/ChartPlaceholder";
 import { OwlMascot } from "@/components/OwlMascot";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InfoCard } from "@/components/InfoCard";
+import { Footer } from "@/components/Footer";
+import { CookieBanner } from "@/components/CookieBanner";
 import {
   Tooltip,
   TooltipContent,
@@ -14,19 +17,36 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+const highlightStats = [
+  { value: "60s", label: "Czas symulacji" },
+  { value: "3", label: "Rodzaje kwot" },
+  { value: "5", label: "Scenariuszy" },
+  { value: "100%", label: "Edukacyjne" },
+];
+
 export default function Home() {
+  const router = useRouter();
   const [expectedPension, setExpectedPension] = useState("");
+  const [isCookieAccepted, setIsCookieAccepted] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsCookieAccepted(!!window.localStorage.getItem("zus-cookie-consent"));
+    }
+  }, []);
 
   const formatCurrency = (value: string) => {
-    // Remove non-digits
     const digits = value.replace(/\D/g, "");
-    // Format with space separator
     return digits.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCurrency(e.target.value);
     setExpectedPension(formatted);
+  };
+
+  const handlePolicyClick = () => {
+    router.push("/polityka-cookies");
   };
 
   return (
@@ -143,26 +163,87 @@ export default function Home() {
             </div>
           </div>
         </section>
-        {/* Cookie Banner */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#002911] text-white">
-          <div className="mx-auto flex h-[82px] w-full max-w-6xl items-center justify-between gap-6 px-4 sm:px-8 text-sm sm:text-base">
-            <p className="flex-1 min-w-0 text-balance font-medium leading-tight text-white/90">
-              Ta strona używa plików cookies, by symulator działał sprawnie i byśmy mogli go ulepszać. Kontynuując, zgadzasz się na ich użycie.
-            </p>
-            <div className="flex flex-shrink-0 items-center gap-3">
-              <Button className="h-10 rounded-[4px] bg-[#1f3829] px-5 text-sm font-medium text-white hover:bg-[#1f3829]/80 sm:text-base">
-                Ustawienia
-              </Button>
-              <Button className="h-10 rounded-[4px] bg-[#1f3829] px-5 text-sm font-medium text-white hover:bg-[#1f3829]/80 sm:text-base">
-                Akceptuję
-              </Button>
-              <button className="text-sm font-medium underline decoration-white/60 underline-offset-4 hover:opacity-80 sm:text-base">
-                Polityka cookies
-              </button>
+
+        {/* Highlight Section */}
+        <section className="relative overflow-hidden bg-[#00993F] py-20 sm:py-28 text-white">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-70"
+            aria-hidden="true"
+            style={{
+              background:
+                "radial-gradient(160% 100% at 50% -20%, rgba(255, 255, 255, 0.45) 0%, rgba(0, 153, 63, 0) 70%)",
+            }}
+          />
+          <div className="container relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap items-center justify-between gap-10 border-b border-white/20 pb-14">
+              {highlightStats.map((stat) => (
+                <div key={stat.label} className="min-w-[140px] space-y-2">
+                  <span className="text-4xl font-semibold tracking-tight sm:text-5xl">
+                    {stat.value}
+                  </span>
+                  <span className="block text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
+                    {stat.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-14 grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:items-end">
+              <div className="space-y-6">
+                <span className="inline-flex items-center rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-white">
+                  Planowanie emerytury
+                </span>
+                <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">
+                  Zacznij planować swoją przyszłość już dziś
+                </h2>
+                <p className="max-w-[560px] text-base leading-7 text-white/85 sm:text-lg">
+                  Wypełnij prosty formularz i poznaj swoją prognozowaną emeryturę w mniej niż minutę.
+                  Porównaj różne scenariusze, uwzględnij dodatkowe lata pracy i zobacz, jak może zmieniać się Twoja miesięczna wypłata.
+                </p>
+                <div className="grid gap-4 text-sm text-white/80 sm:grid-cols-2">
+                  <div className="flex items-start gap-3">
+                    <span className="mt-1 inline-flex size-2 rounded-full bg-white" aria-hidden="true" />
+                    <p>
+                      Prognoza obejmuje kwoty nominalne, urealnione oraz stopę zastąpienia.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="mt-1 inline-flex size-2 rounded-full bg-white" aria-hidden="true" />
+                    <p>
+                      Pięć wbudowanych scenariuszy pozwala szybko porównać różne ścieżki oszczędzania.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start gap-5 rounded-[28px] bg-white/10 p-8 backdrop-blur-sm lg:items-end">
+                <div className="space-y-1 text-left lg:text-right">
+                  <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/70">
+                    Gotowy na symulację?
+                  </p>
+                  <p className="text-lg font-semibold text-white">
+                    Średni czas uzupełnienia: 60 sekund
+                  </p>
+                </div>
+                <Button className="h-14 rounded-[18px] bg-[#FFB34F] px-10 text-base font-semibold text-[--ink] shadow-[0_24px_45px_-20px_rgba(255,179,79,0.75)] transition-transform hover:-translate-y-px hover:bg-[#ffb34f]/90">
+                  Rozpocznij symulację
+                </Button>
+                <p className="max-w-[260px] text-sm text-white/75 lg:text-right">
+                  Twoje dane pozostają na tym urządzeniu. Możesz zapisać wyniki i wrócić do nich w dowolnej chwili.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
       </main>
+
+      <Footer />
+      {!isCookieAccepted && (
+        <CookieBanner
+          onAccept={() => setIsCookieAccepted(true)}
+          onPolicy={() => router.push("/polityka-cookies")}
+        />
+      )}
     </div>
   );
 }
