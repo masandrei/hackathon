@@ -1,0 +1,31 @@
+# Documentation
+memory-bank/
+*.md
+!README.md
+
+# Tests
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Storybook
+.storybook/
+stories/
+
+# Local env files
+.env*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+

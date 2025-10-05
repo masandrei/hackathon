@@ -79,6 +79,14 @@ src/
 │   │   - Karta z ikoną żarówki i tekstem "Czy wiesz, że..."
 │   │   - Stałe wymiary 350x149px i border-radius 24px
 │   │
+│   ├── CookieBanner.tsx           ✅ logika zgody w localStorage
+│   │   - Przycisk "Akceptuję" ukrywa baner
+│   │   - Link do polityki cookies i przycisk ustawień
+│   │
+│   ├── Footer.tsx                 ✅ wielokrotnego użytku
+│   │   - Pełna szerokość, kolor #00993F
+│   │   - Linki do kluczowych stron (cookies, regulamin, kontakt)
+│   │
 │   └── ui/                        ✅ shadcn/ui
 │       ├── button.tsx             61 linii
 │       ├── input.tsx              30 linii
@@ -91,11 +99,16 @@ src/
 │   │   - Metadata
 │   │   - Lang: pl
 │   │
-│   ├── page.tsx                   ✅ ~200 linii (po refaktoringu)
+│   ├── page.tsx                   ✅ ~230 linii (po refaktoringu)
 │   │   - Hero z responsywną typografią i formatowaniem inputu
-│   │   - Użycie reużywalnego komponentu `InfoCard`
+│   │   - Użycie komponentów `InfoCard`, `Footer`, `CookieBanner`
 │   │   - Poprawiony layout sekcji z wykresem i sową
-│   │   - Baner cookies 82 px w jednej linii
+│   │   - Sekcja CTA w kolorze #00993F + CTA card
+│   │
+│   ├── polityka-cookies/          ✅ dedykowana podstrona
+│   │   └── page.tsx               - Nagłówek/stopka współdzielone
+│   │                               - Sekcje opisujące typy cookies
+│   │                               - Baner cookies reagujący na zgodę
 │   │
 │   └── globals.css                ✅ 123 linie
 │       - ZUS brand colors

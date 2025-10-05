@@ -1,0 +1,29 @@
+# Backend files (not needed for frontend deployment)
+backend/
+tests/
+
+# Documentation (keep only essential README)
+*.md
+!README.md
+!frontend/README.md
+
+# Git files
+.git/
+.gitignore
+
+# Logs
+*.log
+
+# Editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+
