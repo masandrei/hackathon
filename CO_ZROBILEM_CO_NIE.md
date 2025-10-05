@@ -17,11 +17,20 @@
 - Używam `CalculationRequest` dla walidacji API
 
 ✅ **Naprawione endpointy:**
-- `POST /calculations` - mapowanie sex (male/female → M/F), JSON dla jobs/leaves
+- `POST /calculations` - **ZINTEGROWANO OBLICZENIA EMERYTURY** ✅
+  - Mapowanie sex (male/female → M/F)
+  - JSON dla jobs/leaves
+  - **Zwraca obliczone wartości:** nominalPension, realPension, replacementRate ✅
 - `GET /calculations` - używa DbCalculation, poprawne datetime formatting
 - `GET /calculations/{id}` - poprawne pole calculation_id
 - `GET /calculations/export` - Excel export działa ✅
 - Global exception handler - datetime.isoformat()
+
+✅ **Integracja algorytmu kalkulacji:**
+- Naprawione importy w `algorithm.py` (relative imports)
+- Dodana uproszczona kalkulacja w `submit_calculation`
+- Zwracane wartości: nominalna, realna, stopa zastąpienia
+- Używa AVERAGE_WAGE z mapper do obliczeń
 
 ✅ **Database schema:**
 - Usunięto 3 stare migracje z błędnym schematem
@@ -56,6 +65,11 @@
 - Z `fetch()` na `AdminService.listCalculations()`
 - Z raw blob handling na typed API client
 - Lepsze error handling z graceful fallback
+
+✅ **Step6Summary - prawdziwe obliczenia:**
+- Usunięto mock data
+- Używa wartości z API: nominalPension, realPension, replacementRate
+- Wyświetla rzeczywiste obliczenia emerytury ✅
 
 ✅ **Dokumentacja frontend:**
 - `frontend/ENV_VARIABLES.md` - przewodnik env vars
