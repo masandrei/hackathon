@@ -42,26 +42,6 @@ async def health_check():
         timestamp=datetime.now()
     )
 
-# Basic endpoint to fetch all rows from a sample table using DI
-@app.get("/db-items", response_model=DatabaseItemsResponse)
-async def get_db_items(db=Depends(get_db)):
-    """Get all items from database with count"""
-    try:
-        cursor = await db.execute("SELECT id, name FROM items")
-        rows = await cursor.fetchall()
-        await cursor.close()
-        
-        items = [DatabaseItemResponse(id=row[0], name=row[1]) for row in rows]
-        return DatabaseItemsResponse(items=items, count=len(items))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-@app.get("/items/{item_id}", response_model=DatabaseItemResponse)
-async def read_item(item_id: int, q: str | None = None):
-    """Get specific item by ID"""
-    # This is a placeholder - you might want to implement actual database lookup
-    return DatabaseItemResponse(id=item_id, name=f"Item {item_id}")
-
 # Statistics endpoints for frontend data
 @app.get("/statistics", response_model=StatisticsResponse)
 async def get_statistics():
