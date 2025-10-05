@@ -18,7 +18,7 @@ import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 function SimulatorContent() {
-  const { currentStep, data } = useSimulator();
+  const { currentStep, data, totalSteps } = useSimulator();
   const router = useRouter();
 
   const renderStep = () => {
@@ -57,12 +57,12 @@ function SimulatorContent() {
     <div className="min-h-screen flex flex-col bg-[#FAFBFC]">
       <Header />
 
-      <main className="flex-1 flex">
+      <main className="flex-1 flex flex-col lg:flex-row">
         {/* Sidebar Navigation - Desktop */}
         <motion.aside
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
+          transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
           className="hidden lg:flex w-80 bg-white border-r border-[--border] p-6 flex-col"
         >
           <div className="mb-8">
@@ -92,20 +92,28 @@ function SimulatorContent() {
         </motion.aside>
 
         {/* Mobile Header */}
-        <div className="lg:hidden w-full bg-white border-b border-[--border] p-4">
+        <motion.div 
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+          className="lg:hidden w-full bg-white border-b border-[--border] p-4 sticky top-0 z-10"
+        >
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-bold text-[--ink]">
               Symulator emerytalny
             </h3>
             <button
               onClick={() => router.push("/")}
-              className="text-[--gray] hover:text-[--navy]"
+              className="text-[--gray] hover:text-[--navy] transition-colors"
             >
               <X size={20} />
             </button>
           </div>
           <ProgressBar />
-        </div>
+          <div className="mt-3 text-xs text-center text-[--gray]">
+            Krok {currentStep} z {totalSteps}
+          </div>
+        </motion.div>
 
         {/* Main Content */}
         <div className="flex-1 overflow-y-auto">

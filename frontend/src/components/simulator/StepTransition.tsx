@@ -13,9 +13,9 @@ export function StepTransition({ children, stepKey }: StepTransitionProps) {
     <AnimatePresence mode="wait">
       <motion.div
         key={stepKey}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, x: 20, scale: 0.98 }}
+        animate={{ opacity: 1, x: 0, scale: 1 }}
+        exit={{ opacity: 0, x: -20, scale: 0.98 }}
         transition={{
           duration: 0.3,
           ease: [0.2, 0.8, 0.2, 1],
