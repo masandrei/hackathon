@@ -3,6 +3,7 @@
 import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function TriviaPage() {
     const triviaFacts = [
@@ -60,7 +61,7 @@ export default function TriviaPage() {
             content: "W 2019 roku tylko 11 osób w Polsce miało emeryturę wyższą niż 15 tys. zł. Obecnie liczba ta wzrosła do ponad 3,7 tys. seniorów - to 336-krotny wzrost w ciągu 5 lat.",
             icon: "📈",
             category: "Statystyki",
-            source: "https://businessinsider.com.pl/praca/emerytury/cala-prawda-o-emeryturach-z-zus-przybywa-bogatych-seniorow/61z59dd"
+            source: "https://businessinsider.com.pl/praca/emerytury/cala-prawda-o-emeryturach-z-zus-przybywa-bogatych-seniorow/n1sylqc"
         },
         {
             id: 8,
@@ -170,9 +171,9 @@ export default function TriviaPage() {
                                         className="bg-[#00993F] hover:bg-[#00993F]/90 text-white px-8 py-3 rounded-full"
                                         asChild
                                     >
-                                        <a href="/">
+                                        <Link href="/">
                                             Przejdź do kalkulatora
-                                        </a>
+                                        </Link>
                                     </Button>
                                 </div>
                             </Card>

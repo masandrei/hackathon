@@ -35,19 +35,6 @@ export default function Home() {
     }
   }, []);
 
-  const highlightStats = [
-    { value: "60s", label: "Czas symulacji" },
-    { value: "3", label: "Rodzaje kwot" },
-    { value: "5", label: "Scenariuszy" },
-    { value: "100%", label: "Edukacyjne" },
-  ];
-
-  const footerLinks = [
-    { label: "Polityka prywatności", href: "#" },
-    { label: "Regulamin", href: "#" },
-    { label: "Kontakt", href: "#" },
-  ];
-
   const formatCurrency = (value: string) => {
     const digits = value.replace(/\D/g, "");
     return digits.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -56,10 +43,6 @@ export default function Home() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCurrency(e.target.value);
     setExpectedPension(formatted);
-  };
-
-  const handlePolicyClick = () => {
-    router.push("/polityka-cookies");
   };
 
   return (
@@ -141,6 +124,7 @@ export default function Home() {
 
                 <Button
                   size="lg"
+                  onClick={() => router.push("/symulacja")}
                   className="w-full sm:w-auto sm:min-w-[240px] h-14 bg-[#ffb34f] hover:bg-[#ffb34f]/90 text-[--ink] text-base font-semibold rounded-[18px] border border-black/10 px-8"
                 >
                   Przejdź do symulacji
@@ -238,7 +222,10 @@ export default function Home() {
                     Średni czas uzupełnienia: 60 sekund
                   </p>
                 </div>
-                <Button className="h-14 rounded-[18px] bg-[#FFB34F] px-10 text-base font-semibold text-[--ink] shadow-[0_24px_45px_-20px_rgba(255,179,79,0.75)] transition-transform hover:-translate-y-px hover:bg-[#ffb34f]/90">
+                <Button 
+                  onClick={() => router.push("/symulacja")}
+                  className="h-14 rounded-[18px] bg-[#FFB34F] px-10 text-base font-semibold text-[--ink] shadow-[0_24px_45px_-20px_rgba(255,179,79,0.75)] transition-transform hover:-translate-y-px hover:bg-[#ffb34f]/90"
+                >
                   Rozpocznij symulację
                 </Button>
                 <p className="max-w-[260px] text-sm text-white/75 lg:text-right">
