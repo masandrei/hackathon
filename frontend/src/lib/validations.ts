@@ -54,7 +54,7 @@ export type JobFormData = z.infer<typeof jobSchema>;
 export type SimulatorFormData = z.infer<typeof simulatorDataSchema>;
 
 // Funkcja walidująca krok po kroku
-export function validateStep(step: number, data: any): { valid: boolean; errors?: string[] } {
+export function validateStep(step: number, data: Record<string, unknown>): { valid: boolean; errors?: string[] } {
   const errors: string[] = [];
   
   switch (step) {

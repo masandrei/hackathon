@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useMemo } from "react";
-import type { CalculationRequest } from "@/api-client/models/CalculationRequest";
 
 export interface Job {
   id: string;

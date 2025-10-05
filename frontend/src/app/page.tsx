@@ -26,7 +26,6 @@ const highlightStats = [
 
 export default function Home() {
   const router = useRouter();
-  const [expectedPension, setExpectedPension] = useState("");
   const [isCookieAccepted, setIsCookieAccepted] = useState(false);
 
   useEffect(() => {
@@ -34,33 +33,6 @@ export default function Home() {
       setIsCookieAccepted(!!window.localStorage.getItem("zus-cookie-consent"));
     }
   }, []);
-
-  const highlightStats = [
-    { value: "60s", label: "Czas symulacji" },
-    { value: "3", label: "Rodzaje kwot" },
-    { value: "5", label: "Scenariuszy" },
-    { value: "100%", label: "Edukacyjne" },
-  ];
-
-  const footerLinks = [
-    { label: "Polityka prywatności", href: "#" },
-    { label: "Regulamin", href: "#" },
-    { label: "Kontakt", href: "#" },
-  ];
-
-  const formatCurrency = (value: string) => {
-    const digits = value.replace(/\D/g, "");
-    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCurrency(e.target.value);
-    setExpectedPension(formatted);
-  };
-
-  const handlePolicyClick = () => {
-    router.push("/polityka-cookies");
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

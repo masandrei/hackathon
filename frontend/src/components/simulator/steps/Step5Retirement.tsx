@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 export function Step5Retirement() {
-  const { data, updateData, nextStep, prevStep, setResults } = useSimulator();
+  const { data, updateData, nextStep, prevStep } = useSimulator();
   const currentYear = new Date().getFullYear();
   const minRetirementYear = currentYear + 1;
   const maxRetirementYear = currentYear + 50;

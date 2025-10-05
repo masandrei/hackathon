@@ -22,6 +22,7 @@ export function Step6Summary() {
     if (!results && !error) {
       handleCalculate();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCalculate = async () => {
@@ -76,16 +77,17 @@ export function Step6Summary() {
           
           setResults(mockResults);
         }
-      } catch (apiError: any) {
+      } catch (apiError: unknown) {
         clearTimeout(timeoutId);
+        const error = apiError as Error;
         
         // Sprawdź czy to timeout
-        if (apiError.name === 'AbortError') {
+        if (error.name === 'AbortError') {
           throw new Error("Przekroczono limit czasu oczekiwania na odpowiedź serwera");
         }
         
         // Sprawdź czy to problem z siecią
-        if (apiError.message === 'Failed to fetch') {
+        if (error.message === 'Failed to fetch') {
           console.warn("Backend niedostępny, używam mockowych danych");
           // Nie pokazuj błędu, użyj mocków
           setIsUsingMockData(true);
@@ -98,14 +100,15 @@ export function Step6Summary() {
           return; // Wyjdź z funkcji bez błędu
         }
         
-        throw apiError;
+        throw error;
       }
-    } catch (err: any) {
-      console.error("Błąd podczas obliczania:", err);
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      console.error("Błąd podczas obliczania:", errorObj);
       
       // Tylko pokaż błąd jeśli nie udało się użyć mocków
-      if (err.message !== 'Failed to fetch') {
-        setError(err.message || "Wystąpił błąd podczas obliczania.");
+      if (errorObj.message !== 'Failed to fetch') {
+        setError(errorObj.message || "Wystąpił błąd podczas obliczania.");
       }
       
       // Zawsze ustaw mockowe wyniki jako fallback

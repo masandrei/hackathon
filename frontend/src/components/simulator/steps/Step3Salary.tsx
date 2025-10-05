@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useSimulator } from "@/contexts/SimulatorContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 
 export function Step3Salary() {
@@ -88,7 +87,7 @@ export function Step3Salary() {
         >
           <div className="relative">
             <input
-              type="text"
+              type="text" 
               inputMode="numeric"
               value={salary}
               onChange={handleInputChange}

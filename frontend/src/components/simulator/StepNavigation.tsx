@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useMemo } from "react";
 
 export function StepNavigation() {
-  const { currentStep, goToStep, data, totalSteps, completedSteps } = useSimulator();
+  const { currentStep, goToStep, data, completedSteps } = useSimulator();
   
   // Dynamicznie buduj listę kroków na podstawie wyboru użytkownika
   const steps = useMemo(() => {
@@ -40,7 +40,7 @@ export function StepNavigation() {
         Krok {currentStep} z {steps.length}
       </div>
       <nav className="space-y-1">
-        {steps.map((step, index) => {
+        {steps.map((step) => {
           const isCompleted = completedSteps.has(step.id);
           const isCurrent = currentStep === step.id;
           // Możesz przejść do kroku jeśli jest obecny, ukończony, lub następny po ostatnim ukończonym

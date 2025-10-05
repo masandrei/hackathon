@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSimulator } from "@/contexts/SimulatorContext";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
