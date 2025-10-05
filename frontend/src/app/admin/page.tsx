@@ -313,14 +313,15 @@ export default function AdminPanel() {
 
                                 <div className="mt-8 flex flex-col items-center justify-center w-full">
                                     <div className="flex items-center gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            disabled={pagination.page === 1}
-                                            onClick={() => handlePageChange(pagination.page - 1)}
-                                        >
-                                            Poprzednia
-                                        </Button>
+                                        {pagination.totalPages > 1 && pagination.page > 1 && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handlePageChange(pagination.page - 1)}
+                                            >
+                                                Poprzednia
+                                            </Button>
+                                        )}
 
                                         <div className="flex items-center gap-1">
                                             {pagination.totalPages > 3 ? (
@@ -347,7 +348,7 @@ export default function AdminPanel() {
                                                     </span>
                                                 </>
                                             ) : (
-                                                Array.from({ length: Math.max(2, pagination.totalPages) }, (_, i) => {
+                                                Array.from({ length: pagination.totalPages }, (_, i) => {
                                                     const pageNum = i + 1;
                                                     return (
                                                         <Button
@@ -364,14 +365,15 @@ export default function AdminPanel() {
                                             )}
                                         </div>
 
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            disabled={pagination.page === pagination.totalPages}
-                                            onClick={() => handlePageChange(pagination.page + 1)}
-                                        >
-                                            Następna
-                                        </Button>
+                                        {pagination.totalPages > 1 && pagination.page < pagination.totalPages && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handlePageChange(pagination.page + 1)}
+                                            >
+                                                Następna
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
                             </>
