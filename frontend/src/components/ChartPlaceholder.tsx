@@ -33,8 +33,8 @@ export function ChartPlaceholder() {
         />
         <div className="relative h-[360px] w-full">
           <div className="pointer-events-none absolute inset-x-10 bottom-16 top-2 flex flex-col justify-between text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fafc4]">
-            {axisLabels.map((label) => (
-              <span key={label} className="text-right pr-4">
+            {axisLabels.map((label, index) => (
+              <span key={`axis-${index}`} className="text-right pr-4">
                 {label}
               </span>
             ))}
