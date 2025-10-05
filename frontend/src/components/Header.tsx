@@ -13,7 +13,7 @@ export function Header() {
           <Link href="/" className="flex items-center gap-4">
             <img src="/assets/ZUS_logo.png" alt="ZUS Logo" className="h-12 w-auto" />
             <svg width="2" height="48" viewBox="0 0 2 48" className="mx-2">
-              <path d="M1 0V48" stroke="#d8d8d8" strokeWidth="1"/>
+              <path d="M1 0V48" stroke="#d8d8d8" strokeWidth="1" />
             </svg>
             <span className="text-lg font-medium uppercase tracking-[0.3em] text-[--ink] sm:text-xl" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
               #RAND0M6
@@ -45,6 +45,12 @@ export function Header() {
               className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base"
             >
               Pomoc / FAQ
+            </Link>
+            <Link
+              href="/trivia"
+              className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base"
+            >
+              Ciekawostki
             </Link>
           </nav>
         </div>

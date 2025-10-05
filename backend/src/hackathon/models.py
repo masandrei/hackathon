@@ -5,6 +5,8 @@ from enum import Enum
 from uuid import UUID
 from sqlalchemy import Column, Integer, String, Float, DateTime, Enum as SAEnum, JSON
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+import uuid
 
 class Sex(str, Enum):
     MALE = "M"

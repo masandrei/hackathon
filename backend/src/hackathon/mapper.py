@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from types import MappingProxyType
 
-FILE = Path("../../statistics.json")
+FILE = Path("statistics.json")
 
 def _freeze_year_map(d: dict) -> dict:
     return MappingProxyType({int(k): float(v) for k, v in d.items()})
