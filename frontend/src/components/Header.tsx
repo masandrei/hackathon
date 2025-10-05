@@ -52,6 +52,12 @@ export function Header() {
             >
               Ciekawostki
             </Link>
+            <Link
+              href="/admin"
+              className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base"
+            >
+              Admin
+            </Link>
           </nav>
         </div>
 

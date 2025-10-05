@@ -83,6 +83,47 @@ class CalculationResponse(BaseModel):
     calculationId: str
     # Additional fields can be added here as needed
 
+# -------------------------- Admin Schemas --------------------------
+
+class CalculationDetail(BaseModel):
+    calculationId: str
+    calculationDate: str
+    calculationTime: str
+    expectedPension: str
+    age: int
+    sex: str
+    salary: str
+    isSickLeaveIncluded: bool
+    totalAccumulatedFunds: str
+    yearWorkStart: int
+    yearDesiredRetirement: int
+    postalCode: Optional[str] = None
+    nominalPension: Optional[str] = None
+    realPension: Optional[str] = None
+
+class CalculationAdminDetail(BaseModel):
+    calculationId: str
+    calculationDate: str
+    calculationTime: str
+    expectedPension: str
+    age: int
+    sex: str
+    salary: str
+    isSickLeaveIncluded: bool
+    totalAccumulatedFunds: str
+    yearWorkStart: int
+    yearDesiredRetirement: int
+    postalCode: Optional[str] = None
+    nominalPension: Optional[str] = None
+    realPension: Optional[str] = None
+
+class PaginatedCalculationsResponse(BaseModel):
+    submissions: List[CalculationAdminDetail]
+    page: int
+    pageSize: int
+    totalItems: int
+    totalPages: int
+
 # -------------------------- Analysis Schemas --------------------------
 
 class AnalysisResponse(BaseModel):
