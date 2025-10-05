@@ -4,18 +4,26 @@ import { motion } from "framer-motion";
 import { useSimulator } from "@/contexts/SimulatorContext";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const steps = [
-  { id: 1, label: "Twoja płeć", shortLabel: "Płeć" },
-  { id: 2, label: "W jakim jesteś wieku?", shortLabel: "Wiek" },
-  { id: 3, label: "Twoje wynagrodzenie brutto", shortLabel: "Wynagrodzenie" },
-  { id: 4, label: "Kiedy zacząłeś pracować?", shortLabel: "Początek kariery" },
-  { id: 5, label: "Kiedy chcesz przejść na emeryturę?", shortLabel: "Emerytura" },
-  { id: 6, label: "Podsumowanie", shortLabel: "Podsumowanie" },
-];
+import { useMemo } from "react";
 
 export function StepNavigation() {
-  const { currentStep, goToStep } = useSimulator();
+  const { currentStep, goToStep, data, totalSteps } = useSimulator();
+  
+  // Dynamicznie buduj listę kroków na podstawie wyboru użytkownika
+  const steps = useMemo(() => {
+    const baseSteps = [
+      { id: 1, label: "Twoja płeć", shortLabel: "Płeć" },
+      { id: 2, label: "W jakim jesteś wieku?", shortLabel: "Wiek" },
+      { id: 3, label: "Twoje wynagrodzenie brutto", shortLabel: "Wynagrodzenie" },
+      { id: 4, label: "Kiedy zacząłeś pracować?", shortLabel: "Początek kariery" },
+      { id: 5, label: "Historia zatrudnienia", shortLabel: "Historia prac" },
+      { id: 6, label: "Zwolnienia lekarskie", shortLabel: "Chorobowe" },
+      { id: 7, label: "Kiedy chcesz przejść na emeryturę?", shortLabel: "Emerytura" },
+      { id: 8, label: "Podsumowanie", shortLabel: "Podsumowanie" },
+    ];
+    
+    return baseSteps.slice(0, totalSteps);
+  }, [totalSteps]);
 
   return (
     <div className="space-y-2">

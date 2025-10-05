@@ -1,7 +1,23 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useMemo } from "react";
 import type { CalculationRequest } from "@/api-client/models/CalculationRequest";
+
+export interface Job {
+  id: string;
+  startDate: string;
+  endDate?: string;
+  baseSalary: number;
+  companyName?: string;
+  position?: string;
+}
+
+export type SickLeaveOption = 'none' | 'average' | 'custom';
+
+export interface SickLeaveData {
+  option: SickLeaveOption;
+  customDays?: number;
+}
 
 export interface SimulatorData {
   age?: number;
@@ -12,6 +28,13 @@ export interface SimulatorData {
   expectedPension?: string;
   isSickLeaveIncluded?: boolean;
   totalAccumulatedFunds?: string;
+  
+  // Historia zatrudnienia
+  includeJobHistory?: boolean;
+  jobs?: Job[];
+  
+  // Chorobowe
+  sickLeaveData?: SickLeaveData;
 }
 
 export interface SimulatorResults {
@@ -39,10 +62,19 @@ const SimulatorContext = createContext<SimulatorContextType | undefined>(
 );
 
 export function SimulatorProvider({ children }: { children: ReactNode }) {
-  const totalSteps = 6; // age, sex, salary, work start, retirement, summary
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<SimulatorData>({});
   const [results, setResults] = useState<SimulatorResults | null>(null);
+  
+  // Dynamiczne obliczanie liczby kroków
+  const totalSteps = useMemo(() => {
+    let steps = 6; // Podstawowe: płeć, wiek, wynagrodzenie, początek kariery, emerytura, podsumowanie
+    if (data.includeJobHistory) {
+      steps += 1; // Zarządzanie pracami
+    }
+    steps += 1; // Chorobowe (zawsze)
+    return steps;
+  }, [data.includeJobHistory]);
 
   const updateData = (newData: Partial<SimulatorData>) => {
     setData((prev) => ({ ...prev, ...newData }));

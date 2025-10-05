@@ -9,6 +9,8 @@ import { Step1Age } from "@/components/simulator/steps/Step1Age";
 import { Step2Sex } from "@/components/simulator/steps/Step2Sex";
 import { Step3Salary } from "@/components/simulator/steps/Step3Salary";
 import { Step4CareerStart } from "@/components/simulator/steps/Step4CareerStart";
+import { Step4aJobHistory } from "@/components/simulator/steps/Step4aJobHistory";
+import { Step5SickLeave } from "@/components/simulator/steps/Step5SickLeave";
 import { Step5Retirement } from "@/components/simulator/steps/Step5Retirement";
 import { Step6Summary } from "@/components/simulator/steps/Step6Summary";
 import { motion } from "framer-motion";
@@ -16,26 +18,39 @@ import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 function SimulatorContent() {
-  const { currentStep } = useSimulator();
+  const { currentStep, data } = useSimulator();
   const router = useRouter();
 
   const renderStep = () => {
-    switch (currentStep) {
-      case 1:
-        return <Step2Sex />;
-      case 2:
-        return <Step1Age />;
-      case 3:
-        return <Step3Salary />;
-      case 4:
-        return <Step4CareerStart />;
-      case 5:
-        return <Step5Retirement />;
-      case 6:
-        return <Step6Summary />;
-      default:
-        return <Step2Sex />;
-    }
+    // Dynamiczne mapowanie kroków na podstawie wyboru użytkownika
+    let stepCounter = 1;
+    
+    // Krok 1: Płeć
+    if (currentStep === stepCounter++) return <Step2Sex />;
+    
+    // Krok 2: Wiek
+    if (currentStep === stepCounter++) return <Step1Age />;
+    
+    // Krok 3: Wynagrodzenie
+    if (currentStep === stepCounter++) return <Step3Salary />;
+    
+    // Krok 4: Początek kariery
+    if (currentStep === stepCounter++) return <Step4CareerStart />;
+    
+    // Krok 4a: Historia zatrudnienia (opcjonalny)
+    if (currentStep === stepCounter++) return <Step4aJobHistory />;
+    
+    // Krok 5: Chorobowe
+    if (currentStep === stepCounter++) return <Step5SickLeave />;
+    
+    // Krok 6: Rok emerytury
+    if (currentStep === stepCounter++) return <Step5Retirement />;
+    
+    // Krok 7: Podsumowanie
+    if (currentStep === stepCounter++) return <Step6Summary />;
+    
+    // Default
+    return <Step2Sex />;
   };
 
   return (
