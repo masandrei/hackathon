@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass
 from dotenv import load_dotenv
 from .schemas import CalculationRequest, CalculationResponse, Job as JobSchema, Leave as LeaveSchema
-from .algorithm import Job as AlgorithmJob, build_multi_job_contributions
+# from .algorithm import Job as AlgorithmJob, build_multi_job_contributions
 from .mapper import AVERAGE_WAGE
 
 # Load environment variables from .env file
@@ -48,123 +48,27 @@ class PensionAPIClient:
     
     def calculate_pension_direct(self, request: PensionRequest) -> Dict:
         """Calculate pension directly using algorithm (no API call)"""
-        try:
-            # Convert JobData to AlgorithmJob
-            algorithm_jobs = []
-            for job in request.jobs:
-                algorithm_job = AlgorithmJob(
-                    base_salary_monthly=job.base_salary_monthly,
-                    base_year=job.base_year,
-                    start_year=job.start_year,
-                    end_year=job.end_year,
-                    label=job.label,
-                    sick_factor=job.sick_factor
-                )
-                algorithm_jobs.append(algorithm_job)
-            
-            # Use the algorithm directly
-            result = build_multi_job_contributions(
-                jobs=algorithm_jobs,
-                start_year=request.start_year,
-                end_year=request.end_year,
-                tau=request.tau,
-                include_sick_leave=request.include_sick_leave,
-                sick_factor_global=request.sick_factor_global,
-                retirement_year=request.retirement_year
-            )
-            
-            # Calculate additional metrics
-            predicted_pension = result.KR / 12  # Convert to monthly
-            current_avg_pension = AVERAGE_WAGE.get(request.retirement_year, 0) * 0.4  # Rough estimate
-            percentile = min(95, max(5, (predicted_pension / current_avg_pension) * 50)) if current_avg_pension > 0 else 50
-            
-            # Convert years to dict format
-            years_data = []
-            for year_breakdown in result.years:
-                years_data.append({
-                    "year": year_breakdown.year,
-                    "monthly_by_job": year_breakdown.monthly_by_job,
-                    "base_annual_before_cap": year_breakdown.base_annual_before_cap,
-                    "cap_annual": year_breakdown.cap_annual,
-                    "base_annual_after_cap": year_breakdown.base_annual_after_cap,
-                    "contributions_by_job": year_breakdown.contributions_by_job,
-                    "contribution_total": year_breakdown.contribution_total,
-                    "valorized_to_retirement": year_breakdown.valorized_to_retirement
-                })
-            
-            return {
-                "predicted_pension": predicted_pension,
-                "current_avg_pension": current_avg_pension,
-                "percentile": percentile,
-                "KR": result.KR,
-                "years": years_data,
-                "summary": f"Przewidywana emerytura: {predicted_pension:.2f} PLN/miesiąc"
-            }
-            
-        except Exception as e:
-            raise Exception(f"Calculation failed: {str(e)}")
+        # TODO: Implement when algorithm is available
+        return {
+            "predicted_pension": 3000.0,
+            "current_avg_pension": 2000.0,
+            "percentile": 75.0,
+            "KR": 360000.0,
+            "years": [],
+            "summary": "Przewidywana emerytura: 3000.00 PLN/miesiąc (mock data)"
+        }
     
     def calculate_pension_from_api_request(self, api_request: CalculationRequest) -> Dict:
         """Calculate pension from API request format"""
-        try:
-            # Convert API request to algorithm format
-            algorithm_jobs = []
-            for job_schema in api_request.jobs:
-                # Convert date format from DD-MM-YYYY to year
-                start_year = int(job_schema.startDate.split('-')[2])
-                end_year = int(job_schema.endDate.split('-')[2]) if job_schema.endDate else None
-                
-                algorithm_job = AlgorithmJob(
-                    base_salary_monthly=float(api_request.salary) / 12,  # Convert annual to monthly
-                    base_year=start_year,
-                    start_year=start_year,
-                    end_year=end_year,
-                    label=f"Job {len(algorithm_jobs) + 1}",
-                    sick_factor=None
-                )
-                algorithm_jobs.append(algorithm_job)
-            
-            # Use the algorithm
-            result = build_multi_job_contributions(
-                jobs=algorithm_jobs,
-                start_year=api_request.yearWorkStart,
-                end_year=api_request.yearDesiredRetirement,
-                tau=0.1952,  # Default tau value
-                include_sick_leave=api_request.isSickLeaveIncluded,
-                sick_factor_global=0.97,
-                retirement_year=api_request.yearDesiredRetirement
-            )
-            
-            # Calculate metrics
-            predicted_pension = result.KR / 12
-            current_avg_pension = AVERAGE_WAGE.get(api_request.yearDesiredRetirement, 0) * 0.4
-            percentile = min(95, max(5, (predicted_pension / current_avg_pension) * 50)) if current_avg_pension > 0 else 50
-            
-            # Convert years to dict format
-            years_data = []
-            for year_breakdown in result.years:
-                years_data.append({
-                    "year": year_breakdown.year,
-                    "monthly_by_job": year_breakdown.monthly_by_job,
-                    "base_annual_before_cap": year_breakdown.base_annual_before_cap,
-                    "cap_annual": year_breakdown.cap_annual,
-                    "base_annual_after_cap": year_breakdown.base_annual_after_cap,
-                    "contributions_by_job": year_breakdown.contributions_by_job,
-                    "contribution_total": year_breakdown.contribution_total,
-                    "valorized_to_retirement": year_breakdown.valorized_to_retirement
-                })
-            
-            return {
-                "predicted_pension": predicted_pension,
-                "current_avg_pension": current_avg_pension,
-                "percentile": percentile,
-                "KR": result.KR,
-                "years": years_data,
-                "summary": f"Przewidywana emerytura: {predicted_pension:.2f} PLN/miesiąc"
-            }
-            
-        except Exception as e:
-            raise Exception(f"Calculation failed: {str(e)}")
+        # TODO: Implement when algorithm is available
+        return {
+            "predicted_pension": 3500.0,
+            "current_avg_pension": 2500.0,
+            "percentile": 80.0,
+            "KR": 420000.0,
+            "years": [],
+            "summary": "Przewidywana emerytura: 3500.00 PLN/miesiąc (mock data)"
+        }
 
 def summarize(age, ret_age, gender, percentile, current_avg_pension, goal_pension, predicted_pension):
     """Generate pension summary using Gemini"""

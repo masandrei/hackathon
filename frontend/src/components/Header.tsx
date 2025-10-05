@@ -37,6 +37,10 @@ export function Header() {
             <Link href="/" className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base">Start</Link>
             <Link href="/dashboard" className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base">Dashboard</Link>
             <Link href="/dane-metody" className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base">Dane & Metody</Link>
+            <Link href="/chat" className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base flex items-center gap-1">
+              <span>🦉</span>
+              <span>Chat z ZUŚką</span>
+            </Link>
             <Link href="/pomoc" className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base">Pomoc / FAQ</Link>
             <Link href="/trivia" className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base">Ciekawostki</Link>
             <Link href="/admin" className="text-sm font-medium text-[#006e2d] hover:opacity-80 transition-opacity lg:text-base">Admin</Link>
@@ -70,6 +74,10 @@ export function Header() {
             <Link href="/" className="text-base font-medium text-[#006e2d] py-2 px-2 rounded hover:bg-[#00993F]/10">Start</Link>
             <Link href="/dashboard" className="text-base font-medium text-[#006e2d] py-2 px-2 rounded hover:bg-[#00993F]/10">Dashboard</Link>
             <Link href="/dane-metody" className="text-base font-medium text-[#006e2d] py-2 px-2 rounded hover:bg-[#00993F]/10">Dane & Metody</Link>
+            <Link href="/chat" className="text-base font-medium text-[#006e2d] py-2 px-2 rounded hover:bg-[#00993F]/10 flex items-center gap-2">
+              <span>🦉</span>
+              <span>Chat z ZUŚką</span>
+            </Link>
             <Link href="/pomoc" className="text-base font-medium text-[#006e2d] py-2 px-2 rounded hover:bg-[#00993F]/10">Pomoc / FAQ</Link>
             <Link href="/trivia" className="text-base font-medium text-[#006e2d] py-2 px-2 rounded hover:bg-[#00993F]/10">Ciekawostki</Link>
             <Link href="/admin" className="text-base font-medium text-[#006e2d] py-2 px-2 rounded hover:bg-[#00993F]/10">Admin</Link>

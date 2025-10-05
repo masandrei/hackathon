@@ -13,8 +13,12 @@ export { CalculationRequest } from './models/CalculationRequest';
 export type { CalculationResponse } from './models/CalculationResponse';
 export type { Job } from './models/Job';
 export type { Leave } from './models/Leave';
+export type { ChatMessage } from './models/ChatMessage';
+export type { ChatResponse } from './models/ChatResponse';
+export type { OwlInfoResponse } from './models/OwlInfoResponse';
 
 export { AdminService } from './services/AdminService';
 export { UserService } from './services/UserService';
 export { StatisticsService } from './services/StatisticsService';
+export { ChatService } from './services/ChatService';
 export type { StatisticsDataResponse, LifeExpectancyData, StatisticsResponse, HealthCheckResponse } from './services/StatisticsService';

@@ -122,16 +122,28 @@ export default function Home() {
                   </p>
                 </div>
 
-                <Button
-                  size="lg"
-                  onClick={() => router.push("/symulacja")}
-                  className="w-full sm:w-auto sm:min-w-[240px] h-14 bg-[#ffb34f] hover:bg-[#ffb34f]/90 text-[--ink] text-base font-semibold rounded-[18px] border border-black/10 px-8"
-                >
-                  Przejdź do symulacji
-                  <svg width="25" height="16" viewBox="0 0 25 16" fill="none" className="ml-2">
-                    <path d="M1 8H24M24 8L17 1M24 8L17 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    size="lg"
+                    onClick={() => router.push("/symulacja")}
+                    className="w-full sm:w-auto sm:min-w-[240px] h-14 bg-[#ffb34f] hover:bg-[#ffb34f]/90 text-[--ink] text-base font-semibold rounded-[18px] border border-black/10 px-8"
+                  >
+                    Przejdź do symulacji
+                    <svg width="25" height="16" viewBox="0 0 25 16" fill="none" className="ml-2">
+                      <path d="M1 8H24M24 8L17 1M24 8L17 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </Button>
+                  
+                  <Button
+                    size="lg"
+                    onClick={() => router.push("/chat")}
+                    variant="outline"
+                    className="w-full sm:w-auto sm:min-w-[200px] h-14 border-2 border-[#ffb34f] text-[#ffb34f] hover:bg-[#ffb34f] hover:text-white text-base font-semibold rounded-[18px] px-8"
+                  >
+                    <span className="mr-2">🦉</span>
+                    Chat z ZUŚką
+                  </Button>
+                </div>
 
                 <p className="flex items-start gap-2 text-sm text-[#6b7280] sm:text-base">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="flex-shrink-0">
