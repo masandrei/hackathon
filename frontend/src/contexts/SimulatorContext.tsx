@@ -79,8 +79,13 @@ export function SimulatorProvider({ children }: { children: ReactNode }) {
   };
 
   const nextStep = () => {
+    console.log('SimulatorContext: nextStep wywołany', { currentStep, totalSteps });
     if (currentStep < totalSteps) {
-      setCurrentStep((prev) => prev + 1);
+      const nextStepNum = currentStep + 1;
+      console.log('SimulatorContext: ustawiam krok na', nextStepNum);
+      setCurrentStep(nextStepNum);
+    } else {
+      console.log('SimulatorContext: już na ostatnim kroku!');
     }
   };
 

@@ -20,8 +20,10 @@ export function Step5Retirement() {
   const yearsUntilRetirement = yearDesiredRetirement - currentYear;
   const retirementAge = (data.age || 25) + yearsUntilRetirement;
 
-  const handleNext = async () => {
+  const handleNext = () => {
+    console.log('Step5Retirement: handleNext wywołany', { yearDesiredRetirement, currentStep: data });
     updateData({ yearDesiredRetirement });
+    console.log('Step5Retirement: nextStep() wywołuję...');
     nextStep();
   };
 
