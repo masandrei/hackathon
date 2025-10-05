@@ -66,11 +66,20 @@ export function SimulatorProvider({ children }: { children: ReactNode }) {
   
   // Dynamiczne obliczanie liczby kroków
   const totalSteps = useMemo(() => {
-    let steps = 6; // Podstawowe: płeć, wiek, wynagrodzenie, początek kariery, emerytura, podsumowanie
+    // 1. Płeć
+    // 2. Wiek
+    // 3. Wynagrodzenie
+    // 4. Początek kariery
+    // 5. Historia zatrudnienia - wybór
+    // 6. Zarządzanie pracami (opcjonalne)
+    // 7/6. Chorobowe
+    // 8/7. Rok emerytury
+    // 9/8. Podsumowanie
+    let steps = 8; // Bez historii prac
     if (data.includeJobHistory) {
-      steps += 1; // Zarządzanie pracami
+      steps = 9; // Z historią prac
     }
-    steps += 1; // Chorobowe (zawsze)
+    console.log('SimulatorContext: totalSteps obliczony:', steps, { includeJobHistory: data.includeJobHistory });
     return steps;
   }, [data.includeJobHistory]);
 
