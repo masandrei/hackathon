@@ -97,6 +97,7 @@ vercel
 - **Components:** shadcn/ui + Radix UI
 - **Icons:** Lucide React
 - **Fonts:** Inter + JetBrains Mono (Google Fonts CDN)
+- **Package manager:** npm
 
 ### Backend
 - **Framework:** FastAPI
