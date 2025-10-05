@@ -89,6 +89,7 @@ export default function AdminPanel() {
 
     useEffect(() => {
         fetchCalculations();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [useMock]);
 
     const formatCurrency = (value: string) => {
@@ -109,24 +110,6 @@ export default function AdminPanel() {
 
     const handlePageChange = (newPage: number) => {
         fetchCalculations(newPage, pagination.pageSize);
-    };
-
-    // Pagination controls
-    const renderPagination = () => {
-        if (pagination.totalPages <= 1) return null;
-        const pages = [];
-        for (let i = 1; i <= pagination.totalPages; i++) {
-            pages.push(
-                <button
-                    key={i}
-                    onClick={() => handlePageChange(i)}
-                    className={`px-2 py-1 mx-1 rounded ${pagination.page === i ? 'bg-primary text-white' : 'bg-gray-200'}`}
-                >
-                    {i}
-                </button>
-            );
-        }
-        return <div className="my-4 flex justify-center">{pages}</div>;
     };
 
     const downloadReport = async () => {

@@ -371,7 +371,7 @@ export default function HelpPage() {
               <div className="text-center py-12">
                 <Info size={48} className="text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600">
-                  Brak pytań w kategorii "{activeCategory}". Wybierz inną kategorię.
+                  Brak pytań w kategorii &ldquo;{activeCategory}&rdquo;. Wybierz inną kategorię.
                 </p>
               </div>
             )}
