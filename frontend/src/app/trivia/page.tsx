@@ -61,7 +61,7 @@ export default function TriviaPage() {
             content: "W 2019 roku tylko 11 osób w Polsce miało emeryturę wyższą niż 15 tys. zł. Obecnie liczba ta wzrosła do ponad 3,7 tys. seniorów - to 336-krotny wzrost w ciągu 5 lat.",
             icon: "📈",
             category: "Statystyki",
-            source: "https://businessinsider.com.pl/praca/emerytury/cala-prawda-o-emeryturach-z-zus-przybywa-bogatych-seniorow/61z59dd"
+            source: "https://businessinsider.com.pl/praca/emerytury/cala-prawda-o-emeryturach-z-zus-przybywa-bogatych-seniorow/n1sylqc"
         },
         {
             id: 8,
