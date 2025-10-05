@@ -30,7 +30,10 @@ class Calculation(CalculationRequest):
 class CalculationResponse(BaseModel):
     nominal_monthly_pension: float
     real_monthly_pension: float
+    funds_by_year: dict[int, float]
+    avg_salaries: dict[int, float]
     average_wage: float
+    replacement_rate: float
 
 class LeaveType(Enum):
     MATERNITY = "MATERNITY"

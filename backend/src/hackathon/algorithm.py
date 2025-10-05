@@ -29,6 +29,7 @@ def get_inflation(start_year: int, end_year: int):
 def compute_pension_funds(calc: Calculation):
     jobs = sorted(calc.jobs, key= lambda x: x.start_date)
     start_year = jobs[0].start_date
+    years: dict[int, (float, float)] = {}
     if len(calc.leaves) == 0:
         avg_leaves = EXPECTED_ABSENCE[calc.sex][max(18, min(65, calc.age))]
         calc.leaves = [Leave(leave_year=year, duration_days=avg_leaves) for year in range(calc.year_work_start, calc.year_desired_retirement + 1)]
@@ -56,9 +57,15 @@ def compute_pension_funds(calc: Calculation):
             total_sum_under_taxes = min(12 * get_salary(job.base_salary, job.start_date, i) * (effective_days / total_days * TAU + (total_days - effective_days) / total_days * leave.get_multiplier()), AVG_SALARIES_PER_YEAR_THRESHOLD * AVERAGE_WAGE[i])
             total_funds = total_funds + total_sum_under_taxes
             total_funds = total_funds * (1 + VALORIZATION[i])
+            inflation=get_inflation(start_year, datetime.now().year)
+            years[i] = (total_funds, total_funds / inflation)
     
-    inflation=get_inflation(start_year, datetime.now().year)
-    return {"nominal": total_funds, "real": total_funds / inflation} if experience >= threshold else {"nominal": 0, "real": 0}
+    return years if experience >= threshold else {}
 
-def compute_montly_pension(available_funds, age: int):
-    return {"nominal": available_funds["nominal"] / LIFE_EXPECTANCY[age], "real": available_funds["real"] / LIFE_EXPECTANCY[age]}
+def compute_montly_pension(available_funds: (float, float), age: int):
+    (nominal, real) = available_funds
+<<<<<<< Updated upstream
+    return {"nominal": nominal / LIFE_EXPECTANCY[age], "real": real / LIFE_EXPECTANCY[age]}
+=======
+    return {"nominal": nominal / LIFE_EXPECTANCY[age], "real": real / LIFE_EXPECTANCY[age]}
+>>>>>>> Stashed changes
