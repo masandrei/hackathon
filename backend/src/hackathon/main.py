@@ -18,7 +18,8 @@ from .schemas import (
     ChatMessage, ChatResponse, ChatErrorResponse, OwlInfoResponse,
     CalculationDetail, CalculationAdminDetail, PaginatedCalculationsResponse
 )
-from .models import Calculation, Job, Leave
+from .models import DbCalculation, Job as DbJob, Leave as DbLeave
+from .schemas import Job as JobSchema, Leave as LeaveSchema
 from .mapper import GROWTH, AVERAGE_WAGE, VALORIZATION, INFLATION, LIFE_EXPECTANCY, LIFE_EXPECTANCY_MALE, LIFE_EXPECTANCY_FEMALE, META
 import uuid
 import os
@@ -115,11 +116,11 @@ async def get_life_expectancy_female():
 async def global_exception_handler(request, exc):
     return JSONResponse(
         status_code=500,
-        content=ErrorResponse(
-            error="Internal Server Error",
-            detail=str(exc),
-            timestamp=datetime.now()
-        ).dict()
+        content={
+            "error": "Internal Server Error",
+            "detail": str(exc),
+            "timestamp": datetime.now().isoformat()
+        }
     )
 
 
@@ -139,29 +140,28 @@ def list_calculations(
         offset = (page - 1) * limit
         
         # Get total count
-        total_items = db.query(Calculation).count()
+        total_items = db.query(DbCalculation).count()
         
         # Get calculations with pagination
-        calculations = db.query(Calculation).offset(offset).limit(limit).all()
+        calculations = db.query(DbCalculation).offset(offset).limit(limit).all()
         
         # Convert to response format
         submissions = []
         for calc in calculations:
-            # Parse timestamp
-            timestamp_parts = calc.calculation_timestamp.split('T')
-            calc_date = timestamp_parts[0] if len(timestamp_parts) > 0 else ""
-            calc_time = timestamp_parts[1] if len(timestamp_parts) > 1 else ""
+            # Format datetime
+            calc_date = calc.calculation_datetime.strftime('%Y-%m-%d')
+            calc_time = calc.calculation_datetime.strftime('%H:%M:%S')
             
             submission = CalculationAdminDetail(
-                calculationId=calc.id,
+                calculationId=calc.calculation_id,
                 calculationDate=calc_date,
                 calculationTime=calc_time,
-                expectedPension=calc.expected_pension,
+                expectedPension=str(calc.expected_pension),
                 age=calc.age,
                 sex=calc.sex,
-                salary=calc.salary,
-                isSickLeaveIncluded=calc.is_sick_leave_included,
-                totalAccumulatedFunds=calc.total_accumulated_funds,
+                salary="0.00",  # Not stored in this model
+                isSickLeaveIncluded=False,  # Not stored in this model
+                totalAccumulatedFunds=str(calc.total_accumulated_funds) if calc.total_accumulated_funds else "0.00",
                 yearWorkStart=calc.year_work_start,
                 yearDesiredRetirement=calc.year_desired_retirement,
                 postalCode=calc.postal_code,
@@ -196,34 +196,31 @@ def download_all_calculations(
     """Download all submitted calculations in XLS format"""
     try:
         # Get all calculations
-        calculations = db.query(Calculation).all()
+        calculations = db.query(DbCalculation).all()
         
         if not calculations:
             # Return empty XLS file
             df = pd.DataFrame(columns=[
-                'ID Obliczenia', 'Data', 'Czas', 'Wiek', 'Płeć', 'Pensja', 
-                'Oczekiwana Emerytura', 'Składki Chorobowe', 'Zgromadzone Środki',
+                'ID Obliczenia', 'Data', 'Czas', 'Wiek', 'Płeć', 
+                'Oczekiwana Emerytura', 'Zgromadzone Środki',
                 'Rok Rozpoczęcia Pracy', 'Rok Planowanej Emerytury', 'Kod Pocztowy'
             ])
         else:
             # Prepare data for export
             data = []
             for calc in calculations:
-                # Parse timestamp
-                timestamp_parts = calc.calculation_timestamp.split('T')
-                calc_date = timestamp_parts[0] if len(timestamp_parts) > 0 else ""
-                calc_time = timestamp_parts[1] if len(timestamp_parts) > 1 else ""
+                # Format datetime
+                calc_date = calc.calculation_datetime.strftime('%Y-%m-%d')
+                calc_time = calc.calculation_datetime.strftime('%H:%M:%S')
                 
                 data.append({
-                    'ID Obliczenia': calc.id,
+                    'ID Obliczenia': calc.calculation_id,
                     'Data': calc_date,
                     'Czas': calc_time,
                     'Wiek': calc.age,
-                    'Płeć': 'Kobieta' if calc.sex == 'female' else 'Mężczyzna',
-                    'Pensja': calc.salary,
+                    'Płeć': 'Kobieta' if calc.sex == 'F' else 'Mężczyzna',
                     'Oczekiwana Emerytura': calc.expected_pension,
-                    'Składki Chorobowe': 'Tak' if calc.is_sick_leave_included else 'Nie',
-                    'Zgromadzone Środki': calc.total_accumulated_funds,
+                    'Zgromadzone Środki': calc.total_accumulated_funds or 0,
                     'Rok Rozpoczęcia Pracy': calc.year_work_start,
                     'Rok Planowanej Emerytury': calc.year_desired_retirement,
                     'Kod Pocztowy': calc.postal_code or ''
@@ -257,26 +254,25 @@ def download_all_calculations(
 def get_calculation_by_id(calculation_id: str, db: Session = Depends(get_db)):
     """Get detailed calculation by ID"""
     try:
-        calculation = db.query(Calculation).filter(Calculation.id == calculation_id).first()
+        calculation = db.query(DbCalculation).filter(DbCalculation.calculation_id == calculation_id).first()
         
         if not calculation:
             raise HTTPException(status_code=404, detail="Calculation not found")
         
-        # Parse timestamp
-        timestamp_parts = calculation.calculation_timestamp.split('T')
-        calc_date = timestamp_parts[0] if len(timestamp_parts) > 0 else ""
-        calc_time = timestamp_parts[1] if len(timestamp_parts) > 1 else ""
+        # Format datetime
+        calc_date = calculation.calculation_datetime.strftime('%Y-%m-%d')
+        calc_time = calculation.calculation_datetime.strftime('%H:%M:%S')
         
         return CalculationDetail(
-            calculationId=calculation.id,
+            calculationId=calculation.calculation_id,
             calculationDate=calc_date,
             calculationTime=calc_time,
-            expectedPension=calculation.expected_pension,
+            expectedPension=str(calculation.expected_pension),
             age=calculation.age,
             sex=calculation.sex,
-            salary=calculation.salary,
-            isSickLeaveIncluded=calculation.is_sick_leave_included,
-            totalAccumulatedFunds=calculation.total_accumulated_funds,
+            salary="0.00",  # Not stored in this model
+            isSickLeaveIncluded=False,  # Not stored in this model
+            totalAccumulatedFunds=str(calculation.total_accumulated_funds) if calculation.total_accumulated_funds else "0.00",
             yearWorkStart=calculation.year_work_start,
             yearDesiredRetirement=calculation.year_desired_retirement,
             postalCode=calculation.postal_code,
@@ -297,42 +293,38 @@ def get_calculation_by_id(calculation_id: str, db: Session = Depends(get_db)):
 )
 def submit_calculation(request: CalculationRequest, db: Session = Depends(get_db)):
     calculation_id = str(uuid.uuid4())
-    calculation = Calculation(
-        id=calculation_id,
-        calculation_timestamp=f"{request.calculationDate}T{request.calculationTime}",
-        expected_pension=request.expectedPension,
+    
+    # Map sex from 'male'/'female' to 'M'/'F'
+    sex_map = {'male': 'M', 'female': 'F'}
+    sex_value = sex_map.get(request.sex.lower(), 'M')
+    
+    # Parse datetime
+    calculation_datetime = datetime.fromisoformat(f"{request.calculationDate}T{request.calculationTime}")
+    
+    # Convert jobs and leaves to JSON
+    jobs_json = [job.dict() for job in request.jobs]
+    leaves_json = [leave.dict() for leave in request.leaves]
+    
+    # Create calculation record
+    calculation = DbCalculation(
+        calculation_id=calculation_id,
+        calculation_datetime=calculation_datetime,
+        expected_pension=float(request.expectedPension),
         age=request.age,
-        sex=request.sex,
-        salary=request.salary,
-        is_sick_leave_included=request.isSickLeaveIncluded,
-        total_accumulated_funds=request.totalAccumulatedFunds,
+        sex=sex_value,
+        total_accumulated_funds=float(request.totalAccumulatedFunds) if request.totalAccumulatedFunds else None,
         year_work_start=request.yearWorkStart,
         year_desired_retirement=request.yearDesiredRetirement,
         postal_code=request.postalCode,
+        jobs=jobs_json,
+        leaves=leaves_json,
     )
+    
     db.add(calculation)
-    db.flush()
-
-    for job in request.jobs:
-        job_obj = Job(
-            calculation_id=calculation.id,
-            start_date=job.startDate,
-            end_date=job.endDate,
-            base_salary=job.baseSalary,
-        )
-        db.add(job_obj)
-
-    for leave in request.leaves:
-        leave_obj = Leave(
-            calculation_id=calculation.id,
-            start_date=leave.startDate,
-            end_date=leave.endDate,
-        )
-        db.add(leave_obj)
-
     db.commit()
     db.refresh(calculation)
-    return CalculationResponse(calculationId=calculation.id)
+    
+    return CalculationResponse(calculationId=calculation.calculation_id)
 
 # --- Analysis & Chat endpoints (kept) ---
 @app.post("/calculations/analyze", response_model=AnalysisResponse, status_code=200)

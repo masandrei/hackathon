@@ -47,7 +47,7 @@ export class AdminService {
     ): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/calculations/download',
+            url: '/calculations/export',
             query: {
                 'lang': lang,
             },

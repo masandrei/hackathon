@@ -16,3 +16,5 @@ export type { Leave } from './models/Leave';
 
 export { AdminService } from './services/AdminService';
 export { UserService } from './services/UserService';
+export { StatisticsService } from './services/StatisticsService';
+export type { StatisticsDataResponse, LifeExpectancyData, StatisticsResponse, HealthCheckResponse } from './services/StatisticsService';

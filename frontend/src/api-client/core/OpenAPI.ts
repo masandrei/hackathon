@@ -20,7 +20,9 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-    BASE: 'http://localhost:8000',
+    BASE: typeof window !== 'undefined' 
+        ? (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000')
+        : (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'),
     VERSION: '1.0.0',
     WITH_CREDENTIALS: false,
     CREDENTIALS: 'include',

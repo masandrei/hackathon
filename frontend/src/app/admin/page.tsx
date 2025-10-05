@@ -4,30 +4,15 @@ import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-interface CalculationAdminDetail {
-    calculationId: string;
-    calculationDate: string;
-    calculationTime: string;
-    expectedPension: string;
-    age: number;
-    sex: string;
-    salary: string;
-    isSickLeaveIncluded: boolean;
-    totalAccumulatedFunds: string;
-    yearWorkStart: number;
-    yearDesiredRetirement: number;
-    postalCode?: string;
-    nominalPension?: string;
-    realPension?: string;
-}
+import { AdminService } from "@/api-client";
+import type { CalculationAdminDetail } from "@/api-client/models/CalculationAdminDetail";
 
 interface PaginatedCalculationsResponse {
-    submissions: CalculationAdminDetail[];
-    page: number;
-    pageSize: number;
-    totalItems: number;
-    totalPages: number;
+    submissions?: CalculationAdminDetail[];
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    totalPages?: number;
 }
 
 export default function AdminPanel() {
@@ -52,11 +37,8 @@ export default function AdminPanel() {
                 const res = await fetch('/mock-responses/calculations-list.json');
                 data = await res.json();
             } else {
-                const response = await fetch(`http://localhost:8000/calculations?page=${page}&limit=${limit}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                data = await response.json();
+                // Use AdminService from API client
+                data = await AdminService.listCalculations(page, limit);
             }
 
             setCalculations(data.submissions || []);
@@ -68,7 +50,7 @@ export default function AdminPanel() {
             });
         } catch (err) {
             // Handle network errors gracefully - show empty state instead of error
-            if (err instanceof TypeError && err.message.includes('fetch')) {
+            if (err instanceof Error && (err.message.includes('fetch') || err.message.includes('Network'))) {
                 // Backend not running - show empty state
                 setCalculations([]);
                 setPagination({
@@ -131,14 +113,8 @@ export default function AdminPanel() {
 
     const downloadReport = async () => {
         try {
-            const response = await fetch('http://localhost:8000/calculations/export?lang=pl-PL');
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            // Get the blob data
-            const blob = await response.blob();
+            // Use AdminService from API client
+            const blob = await AdminService.downloadAllCalculations('pl-PL');
 
             // Create download link
             const url = window.URL.createObjectURL(blob);
