@@ -4,6 +4,31 @@ Historia zmian w dokumentacji memory-bank.
 
 ---
 
+## [3.1.0] - 2025-10-05 - Pension Calculation Integration
+
+### 🧮 Dodane
+- **Algorytm kalkulacji emerytury** zintegrowany z POST /calculations
+- Backend zwraca obliczone wartości: nominalPension, realPension, replacementRate, averageWage
+- Frontend (Step6Summary) wyświetla rzeczywiste obliczenia zamiast mock data
+- Rozszerzona CalculationResponse z polami kalkulacji
+
+### 🔧 Zmiany
+- `backend/src/hackathon/main.py` - dodana logika kalkulacji w submit_calculation
+- `backend/src/hackathon/algorithm.py` - naprawione relative imports
+- `backend/src/hackathon/schemas.py` - rozszerzona CalculationResponse
+- `frontend/src/api-client/models/CalculationResponse.ts` - zaktualizowany model
+- `frontend/src/components/simulator/steps/Step6Summary.tsx` - używa prawdziwych danych
+
+### 📊 Formuła kalkulacji
+- **Nominalna:** Oczekiwana emerytura w przyszłości
+- **Realna:** Urealniona o inflację (2.5% rocznie) do dzisiejszej wartości
+- **Stopa zastąpienia:** Procent średniej krajowej w roku emerytury
+
+### ⚠️ Note
+Obecnie używana uproszczona formuła. Pełny algorytm (compute_pension_funds) wymaga refactoringu.
+
+---
+
 ## [3.0.1] - 2025-10-05 - Excel Export Blob Fix
 
 ### 🐛 Naprawione
