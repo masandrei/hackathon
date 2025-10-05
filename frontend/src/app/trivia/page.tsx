@@ -3,6 +3,7 @@
 import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function TriviaPage() {
     const triviaFacts = [
@@ -170,9 +171,9 @@ export default function TriviaPage() {
                                         className="bg-[#00993F] hover:bg-[#00993F]/90 text-white px-8 py-3 rounded-full"
                                         asChild
                                     >
-                                        <a href="/">
+                                        <Link href="/">
                                             Przejdź do kalkulatora
-                                        </a>
+                                        </Link>
                                     </Button>
                                 </div>
                             </Card>
