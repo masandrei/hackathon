@@ -1,22 +1,18 @@
-[project]
+[tool.poetry]
 name = "hackathon"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Your Name",email = "you@example.com"}
-]
+authors = ["Your Name <you@example.com>"]
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "pydantic (>=2.11.10,<3.0.0)",
-    "fastapi[standard] (>=0.118.0,<1.0.0)",
-    "databases (>=0.8.0,<1.0.0)",
-    "aiosqlite (>=0.19.0,<1.0.0)",
-    "alembic (>=1.16.5,<2.0.0)"
-]
-
-[tool.poetry]
 packages = [{include = "hackathon", from = "src"}]
+
+[tool.poetry.dependencies]
+python = ">=3.13"
+pydantic = ">=2.11.10,<3.0.0"
+fastapi = {extras = ["standard"], version = ">=0.118.0,<1.0.0"}
+databases = ">=0.8.0,<1.0.0"
+aiosqlite = ">=0.19.0,<1.0.0"
+alembic = ">=1.16.5,<2.0.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
