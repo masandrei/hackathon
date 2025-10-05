@@ -4,6 +4,20 @@ Historia zmian w dokumentacji memory-bank.
 
 ---
 
+## [3.0.1] - 2025-10-05 - Excel Export Blob Fix
+
+### 🐛 Naprawione
+- **Excel export download:** API Client teraz poprawnie obsługuje binary responses (blob)
+- **Content-Type detection:** Dodano rozpoznawanie Excel, PDF, i innych formatów binarnych
+- Funkcja `getResponseBody` w `request.ts` teraz zwraca `blob()` dla plików binarnych
+
+### 📊 Impact
+- ✅ Admin Panel: "Pobierz raport XLS" działa poprawnie
+- ✅ Gotowość do pobierania PDF (gdy zaimplementowane)
+- ✅ Wsparcie dla wszystkich typów binarnych (Excel, PDF, images, etc.)
+
+---
+
 ## [3.0.0] - 2025-10-05 - Backend Integration Complete
 
 ### 🔗 Full Stack Integration
@@ -24,6 +38,7 @@ Historia zmian w dokumentacji memory-bank.
 - **JSON serialization:** Datetime objects w error responses
 - **AdminService:** Endpoint /download → /export
 - **CORS errors:** Rozwiązane błędy 500 z proper exception handling
+- **Blob responses:** API Client obsługuje binary downloads (Excel, PDF)
 
 ### ✏️ Zmienione
 - Backend models: Rozdzielone Pydantic (schemas) i SQLAlchemy (models)
