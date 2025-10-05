@@ -3,18 +3,18 @@ import { z } from "zod";
 // Schemat dla pojedynczej pracy
 export const jobSchema = z.object({
   id: z.string(),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data musi być w formacie YYYY-MM-DD"),
-  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data musi być w formacie YYYY-MM-DD").optional(),
+  startDate: z.string().regex(/^\d{4}-01-01$/, "Data musi być w formacie YYYY-01-01"),
+  endDate: z.string().regex(/^\d{4}-01-01$/, "Data musi być w formacie YYYY-01-01").optional(),
   baseSalary: z.number().positive("Wynagrodzenie musi być większe od 0").max(1000000, "Wynagrodzenie jest za wysokie"),
-  companyName: z.string().optional(),
-  position: z.string().optional(),
 }).refine((data) => {
   if (data.endDate) {
-    return new Date(data.startDate) < new Date(data.endDate);
+    const startYear = parseInt(data.startDate.split('-')[0]);
+    const endYear = parseInt(data.endDate.split('-')[0]);
+    return startYear < endYear;
   }
   return true;
 }, {
-  message: "Data zakończenia musi być późniejsza niż data rozpoczęcia",
+  message: "Rok zakończenia musi być późniejszy niż rok rozpoczęcia",
   path: ["endDate"],
 });
 

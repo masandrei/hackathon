@@ -5,11 +5,9 @@ import type { CalculationRequest } from "@/api-client/models/CalculationRequest"
 
 export interface Job {
   id: string;
-  startDate: string;
-  endDate?: string;
+  startDate: string;  // Format: YYYY-01-01 (zawsze początek stycznia)
+  endDate?: string;    // Format: YYYY-01-01 (zawsze początek stycznia)
   baseSalary: number;
-  companyName?: string;
-  position?: string;
 }
 
 export type SickLeaveOption = 'none' | 'average' | 'custom';
