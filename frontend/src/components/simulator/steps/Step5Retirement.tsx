@@ -20,17 +20,8 @@ export function Step5Retirement() {
   const yearsUntilRetirement = yearDesiredRetirement - currentYear;
   const retirementAge = (data.age || 25) + yearsUntilRetirement;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     updateData({ yearDesiredRetirement });
-
-    // Mock calculation - simulate API call
-    const mockResults = {
-      nominalPension: "4850.00",
-      realPension: "3420.00",
-      percentageToAverage: 89,
-    };
-
-    setResults(mockResults);
     nextStep();
   };
 

@@ -10,6 +10,7 @@ import { Step2Sex } from "@/components/simulator/steps/Step2Sex";
 import { Step3Salary } from "@/components/simulator/steps/Step3Salary";
 import { Step4CareerStart } from "@/components/simulator/steps/Step4CareerStart";
 import { Step4aJobHistory } from "@/components/simulator/steps/Step4aJobHistory";
+import { Step4bJobsManager } from "@/components/simulator/steps/Step4bJobsManager";
 import { Step5SickLeave } from "@/components/simulator/steps/Step5SickLeave";
 import { Step5Retirement } from "@/components/simulator/steps/Step5Retirement";
 import { Step6Summary } from "@/components/simulator/steps/Step6Summary";
@@ -37,8 +38,13 @@ function SimulatorContent() {
     // Krok 4: Początek kariery
     if (currentStep === stepCounter++) return <Step4CareerStart />;
     
-    // Krok 4a: Historia zatrudnienia (opcjonalny)
+    // Krok 4a: Historia zatrudnienia - wybór
     if (currentStep === stepCounter++) return <Step4aJobHistory />;
+    
+    // Krok 4b: Zarządzanie pracami (tylko jeśli wybrano "tak")
+    if (data.includeJobHistory && currentStep === stepCounter++) {
+      return <Step4bJobsManager />;
+    }
     
     // Krok 5: Chorobowe
     if (currentStep === stepCounter++) return <Step5SickLeave />;

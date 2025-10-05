@@ -1,16 +1,87 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSimulator } from "@/contexts/SimulatorContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { UserService } from "@/api-client";
+import { LoadingOverlay } from "@/components/LoadingSpinner";
+import type { CalculationRequest } from "@/api-client/models/CalculationRequest";
 
 export function Step6Summary() {
-  const { data, results, prevStep, resetSimulator, goToStep } = useSimulator();
+  const { data, results, prevStep, resetSimulator, goToStep, setResults } = useSimulator();
   const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [calculationId, setCalculationId] = useState<string | null>(null);
+
+  // Automatyczne wysłanie do API po załadowaniu
+  useEffect(() => {
+    if (!results && !error) {
+      handleCalculate();
+    }
+  }, []);
+
+  const handleCalculate = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const currentDate = new Date();
+      
+      // Przygotuj dane do wysłania
+      const requestData: CalculationRequest = {
+        calculationDate: currentDate.toISOString().split('T')[0],
+        calculationTime: currentDate.toTimeString().split(' ')[0],
+        expectedPension: data.salary || "0", // Używamy obecnego wynagrodzenia jako oczekiwanej emerytury
+        age: data.age || 25,
+        sex: (data.sex || "male") as CalculationRequest.sex,
+        salary: data.salary || "0",
+        isSickLeaveIncluded: data.sickLeaveData?.option !== 'none',
+        totalAccumulatedFunds: data.totalAccumulatedFunds || "0",
+        yearWorkStart: data.yearWorkStart || new Date().getFullYear() - 5,
+        yearDesiredRetirement: data.yearDesiredRetirement || new Date().getFullYear() + 30,
+        postalCode: undefined,
+        jobs: data.jobs?.map(job => ({
+          startDate: job.startDate,
+          endDate: job.endDate || undefined,
+          baseSalary: job.baseSalary,
+        })) || [],
+        leaves: [], // Chorobowe na razie jako pusta tablica
+      };
+
+      // Wywołaj API
+      const response = await UserService.submitCalculation(requestData);
+      
+      if (response && response.id) {
+        setCalculationId(response.id);
+        
+        // Mock results (póki backend nie zwraca pełnych danych)
+        // W przyszłości możesz pobrać szczegóły przez GET /calculations/{id}
+        const mockResults = {
+          nominalPension: "4850.00",
+          realPension: "3420.00",
+          percentageToAverage: 89,
+        };
+        
+        setResults(mockResults);
+      }
+    } catch (err: any) {
+      console.error("Błąd podczas obliczania:", err);
+      setError(err.message || "Wystąpił błąd podczas obliczania. Spróbuj ponownie.");
+      
+      // Fallback do mockowych danych w przypadku błędu
+      const mockResults = {
+        nominalPension: "4850.00",
+        realPension: "3420.00",
+        percentageToAverage: 89,
+      };
+      setResults(mockResults);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleEdit = (step: number) => {
     goToStep(step);
@@ -31,8 +102,15 @@ export function Step6Summary() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-[600px] px-6 pt-[25px] pb-12">
-      <div className="w-full max-w-4xl space-y-12">
+    <>
+      <AnimatePresence>
+        {isLoading && (
+          <LoadingOverlay message="Obliczam Twoją przyszłą emeryturę..." />
+        )}
+      </AnimatePresence>
+      
+      <div className="flex flex-col items-center justify-start min-h-[600px] px-6 pt-[25px] pb-12">
+        <div className="w-full max-w-4xl space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
           <motion.div
@@ -239,8 +317,42 @@ export function Step6Summary() {
             </Button>
           </div>
         </motion.div>
+
+        {/* Error message */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[--red]/10 border-2 border-[--red]/20 rounded-2xl p-6 text-center"
+          >
+            <div className="text-[--red] font-semibold mb-2">
+              Wystąpił błąd
+            </div>
+            <div className="text-sm text-[--ink]/70">
+              {error}
+            </div>
+            <Button
+              onClick={handleCalculate}
+              className="mt-4 bg-[#00993F] hover:bg-[#00993F]/90 text-white"
+            >
+              Spróbuj ponownie
+            </Button>
+          </motion.div>
+        )}
+
+        {/* API Info */}
+        {calculationId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center text-sm text-[--gray]"
+          >
+            ID obliczeń: {calculationId}
+          </motion.div>
+        )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
