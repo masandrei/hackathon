@@ -15,5 +15,14 @@ AVERAGE_WAGE       = _freeze_year_map(raw["average_wage"])
 VALORIZATION       = _freeze_year_map(raw["valorization"])
 INFLATION          = _freeze_year_map(raw["inflation"])
 LIFE_EXPECTANCY    = _freeze_year_map(raw["life_expectancy"])
-EXPECTED_ABSENCE   = _freeze_year_map(raw["average_leave"])
+
+# For now, use the same life expectancy data for both genders
+# In a real application, you'd have separate data for male/female
+LIFE_EXPECTANCY_MALE = LIFE_EXPECTANCY
+LIFE_EXPECTANCY_FEMALE = LIFE_EXPECTANCY
+
+# Handle nested structure for average_leave
+EXPECTED_ABSENCE_FEMALE = _freeze_year_map(raw["average_leave"]["F"])
+EXPECTED_ABSENCE_MALE = _freeze_year_map(raw["average_leave"]["M"])
+
 META               = MappingProxyType({"scenario": raw.get("scenario",""), "prepared_on": raw.get("prepared_on","")})

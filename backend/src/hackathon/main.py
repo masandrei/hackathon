@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from __future__ import annotations
 import uvicorn
 from datetime import datetime
 from typing import List, Optional
@@ -70,15 +71,6 @@ async def get_statistics():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error loading statistics: {str(e)}")
 
-import uuid
-from fastapi import FastAPI
-from hackathon.mapper import AVERAGE_WAGE
-from hackathon.models import Calculation, CalculationRequest, CalculationResponse
-from hackathon.algorithm import compute_pension_funds, compute_montly_pension 
-import uvicorn
-from datetime import datetime
-
-app = FastAPI(title="Hackathon API")
 
 @app.get("/")
 def root():
@@ -398,20 +390,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-@app.post("/calculations")
-def create_calculation(calculation: CalculationRequest):
-    calc = Calculation(**calculation, calculation_id=uuid.uuid4(), calculation_datetime=datetime.now())
-    avg_salaries = {year: AVERAGE_WAGE[year] for year in range(calc.year_work_start, calc.year_desired_retirement + 1)}
-    calc.year_desired_retirement += 5
-    funds_by_year = compute_pension_funds(calc)
-    calc.year_desired_retirement -= 5
-    monthly_pension = compute_montly_pension(funds_by_year[calc.year_desired_retirement], calc.age)
-    return CalculationResponse(nominal_monthly_pension=monthly_pension["nominal"],
-                                real_monthly_pension=monthly_pension["real"],
-                                average_wage=AVERAGE_WAGE[calc.year_desired_retirement],
-                                funds_by_year={year: funds_by_year[year] for year in funds_by_year.keys if year == calc.year_desired_retirement + 1 or
-                                                                                                            year == calc.year_desired_retirement + 2 or
-                                                                                                            year == calc.year_desired_retirement + 5 or
-                                                                                                            year <= calc.year_desired_retirement},
-                                avg_salaries=avg_salaries,
-                                replacement_rate=monthly_pension["nominal"] / AVERAGE_WAGE[calc.year_desired_retirement])

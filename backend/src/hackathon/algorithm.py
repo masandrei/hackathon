@@ -1,5 +1,5 @@
 from models import Calculation, Leave, Sex
-from mapper import GROWTH, VALORIZATION, AVERAGE_WAGE, INFLATION, LIFE_EXPECTANCY, EXPECTED_ABSENCE
+from mapper import GROWTH, VALORIZATION, AVERAGE_WAGE, INFLATION, LIFE_EXPECTANCY, EXPECTED_ABSENCE_FEMALE, EXPECTED_ABSENCE_MALE
 from datetime import datetime
 
 TAU = 0.196
@@ -31,7 +31,10 @@ def compute_pension_funds(calc: Calculation):
     start_year = jobs[0].start_date
     years: dict[int, (float, float)] = {}
     if len(calc.leaves) == 0:
-        avg_leaves = EXPECTED_ABSENCE[calc.sex][max(18, min(65, calc.age))]
+        if calc.sex == Sex.FEMALE:
+            avg_leaves = EXPECTED_ABSENCE_FEMALE[max(18, min(65, calc.age))]
+        else:
+            avg_leaves = EXPECTED_ABSENCE_MALE[max(18, min(65, calc.age))]
         calc.leaves = [Leave(leave_year=year, duration_days=avg_leaves) for year in range(calc.year_work_start, calc.year_desired_retirement + 1)]
     if calc.total_accumulated_funds is None:
         total_funds = 0
