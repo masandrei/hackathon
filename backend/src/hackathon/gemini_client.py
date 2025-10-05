@@ -429,41 +429,29 @@ def chat_with_owl(message: str) -> Dict:
         configure_gemini()
         model = genai.GenerativeModel('gemini-2.5-flash')
         
-        # Rozszerzone rozpoznawanie akcji - różne warianty i synonimy
-        action_patterns = {
-            "calculate_pension": [
-                "oblicz emeryturę", "policz emeryturę", "kalkulator emerytury", 
-                "oblicz", "policz", "kalkulator", "emerytura", "emerytury",
-                "chcę obliczyć", "pomóż obliczyć", "jak obliczyć emeryturę"
-            ],
-            "show_statistics": [
-                "pokaż statystyki", "statystyki", "dane", "wykresy", 
-                "pokaż dane", "statystyki emerytur", "dane ekonomiczne",
-                "inflacja", "płace", "wzrost", "wartości"
-            ],
-            "health_check": [
-                "sprawdź zdrowie", "status aplikacji", "czy działa", 
-                "sprawdź aplikację", "zdrowie", "status", "działa",
-                "czy wszystko ok", "sprawdź system"
-            ],
-            "show_help": [
-                "pomoc", "funkcje", "co potrafisz", "co możesz", 
-                "pomóż", "help", "menu", "opcje", "co robić",
-                "jak używać", "instrukcja"
-            ]
+        # Szybkie wzorce dla najczęstszych przypadków
+        quick_patterns = {
+            "calculate_pension": ["oblicz emeryturę", "kalkulator", "emerytura"],
+            "show_statistics": ["statystyki", "dane", "wykresy"],
+            "health_check": ["zdrowie", "status", "działa"],
+            "show_help": ["pomoc", "funkcje", "co potrafisz"]
         }
         
-        # Sprawdź czy wiadomość zawiera prośbę o wykonanie akcji
+        # Sprawdź szybkie wzorce
         detected_action = None
         message_lower = message.lower()
         
-        for action, patterns in action_patterns.items():
+        for action, patterns in quick_patterns.items():
             for pattern in patterns:
                 if pattern in message_lower:
                     detected_action = action
                     break
             if detected_action:
                 break
+        
+        # Jeśli nie znaleziono w szybkich wzorcach, użyj Gemini do interpretacji
+        if not detected_action:
+            detected_action = interpret_user_intent_with_gemini(model, message)
         
         if detected_action:
             # Wykonaj akcję
@@ -583,6 +571,39 @@ def execute_owl_action(action: str, message: str) -> Dict:
             
     except Exception as e:
         return {"success": False, "error": f"Błąd wykonania akcji: {str(e)}"}
+
+def interpret_user_intent_with_gemini(model, message: str) -> Optional[str]:
+    """Use Gemini to interpret user intent and determine action"""
+    try:
+        intent_prompt = f"""
+        Jesteś ekspertem w rozpoznawaniu intencji użytkowników aplikacji do kalkulacji emerytur.
+        
+        Użytkownik napisał: "{message}"
+        
+        Określ czy użytkownik chce wykonać jedną z tych akcji:
+        1. "calculate_pension" - chce obliczyć/policzyć emeryturę, użyć kalkulatora
+        2. "show_statistics" - chce zobaczyć statystyki, dane, wykresy, informacje ekonomiczne
+        3. "health_check" - chce sprawdzić status aplikacji, czy działa
+        4. "show_help" - chce pomocy, informacji o funkcjach, menu
+        5. "none" - to zwykłe pytanie/rozmowa, nie prośba o akcję
+        
+        Odpowiedz TYLKO jedną z opcji: calculate_pension, show_statistics, health_check, show_help, none
+        """
+        
+        response = model.generate_content(intent_prompt)
+        intent = response.text.strip().lower()
+        
+        # Walidacja odpowiedzi
+        valid_actions = ["calculate_pension", "show_statistics", "health_check", "show_help", "none"]
+        if intent in valid_actions:
+            return intent if intent != "none" else None
+        else:
+            # Fallback - jeśli Gemini zwróci coś nieoczekiwanego
+            return None
+            
+    except Exception as e:
+        print(f"Błąd interpretacji intencji: {str(e)}")
+        return None
 
 if __name__ == "__main__":
     main()
