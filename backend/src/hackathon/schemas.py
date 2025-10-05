@@ -81,7 +81,10 @@ class CalculationRequest(BaseModel):
 
 class CalculationResponse(BaseModel):
     calculationId: str
-    # Additional fields can be added here as needed
+    nominalPension: Optional[str] = None
+    realPension: Optional[str] = None
+    replacementRate: Optional[float] = None
+    averageWage: Optional[float] = None
 
 # -------------------------- Admin Schemas --------------------------
 

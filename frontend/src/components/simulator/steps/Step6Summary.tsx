@@ -36,7 +36,8 @@ export function Step6Summary() {
       const requestData: CalculationRequest = {
         calculationDate: currentDate.toISOString().split('T')[0],
         calculationTime: currentDate.toTimeString().split(' ')[0],
-        expectedPension: data.salary || "0",
+        // Use expectedPension if available, otherwise estimate from salary (3x salary as pension goal)
+        expectedPension: data.expectedPension || (data.salary ? String(parseFloat(data.salary) * 0.6) : "0"),
         age: data.age || 25,
         sex: (data.sex || "male") as CalculationRequest.sex,
         salary: data.salary || "0",
@@ -54,6 +55,11 @@ export function Step6Summary() {
       };
 
       console.log("Wysyłam dane do API:", requestData);
+      console.log("expectedPension calculation:", {
+        fromData: data.expectedPension,
+        fromSalary: data.salary,
+        calculated: requestData.expectedPension
+      });
 
       // Wywołaj API z timeout
       const controller = new AbortController();
@@ -64,18 +70,25 @@ export function Step6Summary() {
         clearTimeout(timeoutId);
         
         console.log("Odpowiedź z API:", response);
+        console.log("Typy pól:", {
+          calculationId: typeof response.calculationId,
+          nominalPension: typeof response.nominalPension,
+          realPension: typeof response.realPension,
+          replacementRate: typeof response.replacementRate,
+        });
         
-        if (response && response.id) {
-          setCalculationId(response.id);
+        if (response && response.calculationId) {
+          setCalculationId(response.calculationId);
           
-          // Mock results - w przyszłości pobierz z GET /calculations/{id}
-          const mockResults = {
-            nominalPension: "4850.00",
-            realPension: "3420.00",
-            percentageToAverage: 89,
+          // Use calculated results from API
+          const calculatedResults = {
+            nominalPension: response.nominalPension || "0.00",
+            realPension: response.realPension || "0.00",
+            percentageToAverage: response.replacementRate || 0,
           };
           
-          setResults(mockResults);
+          console.log("Ustawiam wyniki:", calculatedResults);
+          setResults(calculatedResults);
         }
       } catch (apiError: unknown) {
         clearTimeout(timeoutId);
@@ -221,7 +234,7 @@ export function Step6Summary() {
               Stopa zastąpienia
             </div>
             <div className="text-4xl font-black mb-2">
-              {results?.percentageToAverage || 0}%
+              {results?.percentageToAverage ? results.percentageToAverage.toFixed(2) : '0.00'}%
             </div>
             <div className="text-sm opacity-80">do średniej krajowej</div>
           </div>

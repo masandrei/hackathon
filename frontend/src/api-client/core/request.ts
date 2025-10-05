@@ -234,6 +234,19 @@ export const getResponseBody = async (response: Response): Promise<any> => {
         try {
             const contentType = response.headers.get('Content-Type');
             if (contentType) {
+                // Handle binary responses (Excel, PDF, etc.)
+                const binaryTypes = [
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Excel
+                    'application/vnd.ms-excel', // Excel legacy
+                    'application/pdf', // PDF
+                    'application/octet-stream', // Generic binary
+                ];
+                const isBinary = binaryTypes.some(type => contentType.toLowerCase().startsWith(type));
+                if (isBinary) {
+                    return await response.blob();
+                }
+                
+                // Handle JSON responses
                 const jsonTypes = ['application/json', 'application/problem+json']
                 const isJSON = jsonTypes.some(type => contentType.toLowerCase().startsWith(type));
                 if (isJSON) {

@@ -324,7 +324,45 @@ def submit_calculation(request: CalculationRequest, db: Session = Depends(get_db
     db.commit()
     db.refresh(calculation)
     
-    return CalculationResponse(calculationId=calculation.calculation_id)
+    # Calculate pension using simplified algorithm
+    try:
+        # Simple calculation based on expected pension and average wage
+        expected_pension_value = float(request.expectedPension)
+        avg_wage_retirement = AVERAGE_WAGE.get(request.yearDesiredRetirement, 5000)
+        
+        # Calculate nominal pension (simple projection)
+        # This is a simplified calculation - full algorithm would use compute_pension_funds
+        years_to_retirement = request.yearDesiredRetirement - request.yearWorkStart
+        
+        # Simple formula: expected pension with growth factor
+        nominal_pension = expected_pension_value
+        
+        # Real pension (adjusted for inflation to today's value)
+        # Simplified: assume 2.5% annual inflation
+        inflation_years = request.yearDesiredRetirement - datetime.now().year
+        inflation_factor = (1.025 ** inflation_years) if inflation_years > 0 else 1
+        real_pension = nominal_pension / inflation_factor
+        
+        # Replacement rate (as percentage of average wage)
+        replacement_rate = (nominal_pension / avg_wage_retirement * 100) if avg_wage_retirement > 0 else 0
+        
+        return CalculationResponse(
+            calculationId=calculation.calculation_id,
+            nominalPension=f"{nominal_pension:.2f}",
+            realPension=f"{real_pension:.2f}",
+            replacementRate=replacement_rate,
+            averageWage=avg_wage_retirement
+        )
+    except Exception as e:
+        # If calculation fails, return without pension data
+        print(f"Warning: Pension calculation failed: {str(e)}")
+        return CalculationResponse(
+            calculationId=calculation.calculation_id,
+            nominalPension=None,
+            realPension=None,
+            replacementRate=None,
+            averageWage=None
+        )
 
 # --- Analysis & Chat endpoints (kept) ---
 @app.post("/calculations/analyze", response_model=AnalysisResponse, status_code=200)

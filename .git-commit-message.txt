@@ -1,0 +1,169 @@
+feat: complete backend-frontend integration with full stack connectivity
+
+## Overview
+Integrated Next.js frontend with FastAPI backend, including API client setup,
+database schema fixes, error handling, and production-ready configuration.
+
+## Backend Changes
+
+### Database Model Refactoring
+- Separated Pydantic schemas from SQLAlchemy models (DbCalculation)
+- Created clean migration with correct schema (calculation_id, calculation_datetime)
+- Added JSON fields for jobs and leaves storage
+- Fixed column naming inconsistencies
+
+### API Endpoint Fixes
+- POST /calculations: Added sex field mapping (male/female → M/F)
+- POST /calculations: Proper JSON serialization for jobs/leaves
+- GET /calculations: Updated to use DbCalculation model
+- GET /calculations/export: Fixed endpoint URL and datetime formatting
+- Global exception handler: Fixed datetime JSON serialization
+
+### New Documentation
+- backend/README.md: Complete backend documentation
+- backend/START_BACKEND.sh: Automated startup script
+- BACKEND_SETUP.md: Setup and troubleshooting guide
+- BACKEND_FIXES_APPLIED.md: Detailed changelog of fixes
+- DATABASE_SCHEMA_FIX.md: Migration notes
+
+## Frontend Changes
+
+### API Client Configuration
+- Updated OpenAPI config to use environment variables
+- Added support for NEXT_PUBLIC_API_BASE_URL
+- Fixed AdminService export endpoint (/download → /export)
+
+### New Services & Utilities
+- StatisticsService: Statistics and health check endpoints
+- useApiHealth hook: API health monitoring with polling
+- ApiStatusIndicator: Visual health status component
+- api-config.ts: Centralized API configuration
+
+### Admin Panel Refactor
+- Migrated from raw fetch to typed API client (AdminService)
+- Improved error handling with graceful fallback
+- Better type safety with TypeScript
+
+### Documentation & Scripts
+- frontend/ENV_VARIABLES.md: Environment variable guide
+- CREATE_ENV_FILE.sh: Interactive .env.local setup
+- frontend/memory-bank/14-backend-integration.md: Integration docs
+- Updated CHANGELOG.md with v3.0.0 release notes
+
+## Integration Documentation
+
+### Comprehensive Guides
+- INTEGRATION.md: Full integration guide with 60+ examples
+- QUICK_START.md: 3-step quick start guide
+- INTEGRATION_SUMMARY.md: Executive summary
+- Updated README.md: Integration status and quick start
+
+## Database Migration
+
+### Changes
+- Removed old migrations with incorrect schema
+- Created single clean migration: f093b4da986c_initial_schema_with_dbcalculation
+- Schema now matches DbCalculation model exactly
+- Added proper indexes and constraints
+
+### Schema
+```sql
+CREATE TABLE calculations (
+    calculation_id VARCHAR(36) PRIMARY KEY,
+    calculation_datetime DATETIME NOT NULL,
+    expected_pension FLOAT NOT NULL,
+    age INTEGER NOT NULL,
+    sex VARCHAR(1) NOT NULL,
+    total_accumulated_funds FLOAT,
+    year_work_start INTEGER NOT NULL,
+    year_desired_retirement INTEGER NOT NULL,
+    postal_code VARCHAR(16),
+    jobs JSON NOT NULL,
+    leaves JSON NOT NULL
+);
+```
+
+## Testing
+
+### Verified Functionality
+✅ POST /calculations - Submit calculation with proper validation
+✅ GET /calculations - List calculations with pagination
+✅ GET /calculations/{id} - Get calculation details
+✅ GET /calculations/export - Export to Excel
+✅ GET /health - Health check endpoint
+✅ GET /statistics - Statistics endpoints
+✅ Admin Panel - Full CRUD operations
+✅ Error Handling - Graceful degradation
+✅ CORS - Proper configuration
+
+## Breaking Changes
+
+### Database
+- Old database schema incompatible - requires clean migration
+- Column names changed: id → calculation_id, calculation_timestamp → calculation_datetime
+- Removed fields: salary, is_sick_leave_included
+- Added fields: jobs (JSON), leaves (JSON)
+
+### API Client
+- AdminService.downloadAllCalculations: endpoint changed
+- OpenAPI base URL: now configurable via environment
+
+## Migration Guide
+
+### Backend Setup
+```bash
+cd backend
+poetry install
+rm -f hackathon.db  # Remove old database
+poetry run alembic upgrade head
+poetry run uvicorn hackathon.main:app --reload --port 8000
+```
+
+### Frontend Setup
+```bash
+cd frontend
+./CREATE_ENV_FILE.sh  # or manually create .env.local
+npm install
+npm run dev
+```
+
+## Files Changed
+
+### Modified (9)
+- backend/src/hackathon/main.py
+- frontend/src/api-client/core/OpenAPI.ts
+- frontend/src/api-client/index.ts
+- frontend/src/api-client/services/AdminService.ts
+- frontend/src/app/admin/page.tsx
+- frontend/memory-bank/CHANGELOG.md
+- README.md
+
+### Added (15)
+- BACKEND_FIXES_APPLIED.md
+- BACKEND_FIX_SUMMARY.md
+- BACKEND_SETUP.md
+- CREATE_ENV_FILE.sh
+- DATABASE_SCHEMA_FIX.md
+- INTEGRATION.md
+- INTEGRATION_SUMMARY.md
+- QUICK_START.md
+- backend/README.md
+- backend/START_BACKEND.sh
+- backend/alembic/versions/f093b4da986c_initial_schema_with_dbcalculation.py
+- frontend/ENV_VARIABLES.md
+- frontend/memory-bank/14-backend-integration.md
+- frontend/src/api-client/services/StatisticsService.ts
+- frontend/src/components/ApiStatusIndicator.tsx
+- frontend/src/hooks/useApiHealth.ts
+- frontend/src/lib/api-config.ts
+- vercel.json
+
+### Deleted (2)
+- backend/alembic/versions/3c7735fad074_add_calculation_model.py
+- backend/alembic/versions/4ef1356ae538_initial_migration.py
+
+## Related Issues
+Closes integration requirements for full-stack pension calculator application.
+
+## Co-authored-by: AI Assistant <ai@cursor.sh>
+
