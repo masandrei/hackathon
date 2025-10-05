@@ -222,16 +222,18 @@ def analyze_calculation(request: CalculationRequest):
     status_code=200,
 )
 def chat_with_owl_endpoint(message: ChatMessage):
-    """Chat with the owl mascot - Sowa Mądra"""
+    """Chat with the owl mascot - ZUŚka (intelligent action detection)"""
     try:
         from .gemini_client import chat_with_owl
         
-        # Get response from owl
-        owl_response = chat_with_owl(message.message)
+        # Get response from owl with intelligent action detection
+        owl_result = chat_with_owl(message.message)
         
         return ChatResponse(
-            response=owl_response,
-            timestamp=datetime.now()
+            response=owl_result["response"],
+            timestamp=datetime.now(),
+            action_executed=owl_result.get("action_executed"),
+            action_result=owl_result.get("action_result")
         )
         
     except Exception as e:
@@ -249,17 +251,19 @@ def chat_with_owl_endpoint(message: ChatMessage):
 def get_owl_info():
     """Get information about the owl mascot"""
     return OwlInfoResponse(
-        name="Sowa Mądra",
-        description="Przyjazna maskotka aplikacji do kalkulacji emerytur, ekspert w dziedzinie finansów osobistych i emerytur.",
-        personality="Przyjazna, pomocna, zachęcająca, profesjonalna ale nieformalna, czasami używa sówich wyrażeń.",
+        name="ZUŚka",
+        description="Inteligentna maskotka aplikacji do kalkulacji emerytur, ekspert w dziedzinie finansów osobistych i emerytur. Może wykonywać akcje w aplikacji!",
+        personality="Przyjazna, pomocna, zachęcająca, profesjonalna ale nieformalna, czasami używa sówich wyrażeń, może wykonywać polecenia.",
         capabilities=[
             "Odpowiadanie na pytania o emerytury",
             "Wyjaśnianie pojęć finansowych",
             "Pomoc w korzystaniu z aplikacji",
             "Motywowanie do planowania emerytury",
-            "Dzielenie się praktycznymi radami"
+            "Dzielenie się praktycznymi radami",
+            "Wykonywanie akcji: 'oblicz emeryturę', 'pokaż statystyki', 'sprawdź zdrowie'",
+            "Wywoływanie API i skryptów aplikacji"
         ],
-        greeting="Hoo hoo! Cześć! Jestem Sowa Mądra, Twoja przewodniczka po świecie emerytur! 🦉 Skrzydła w górę i zapraszam do rozmowy!"
+        greeting="Hoo hoo! Cześć! Jestem ZUŚka, Twoja inteligentna przewodniczka po świecie emerytur! 🦉 Mogę nie tylko odpowiadać na pytania, ale też wykonywać akcje w aplikacji! Skrzydła w górę!"
     )
 
 

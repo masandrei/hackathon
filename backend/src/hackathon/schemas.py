@@ -105,6 +105,8 @@ class ChatResponse(BaseModel):
     response: str
     timestamp: datetime
     success: bool = True
+    action_executed: Optional[str] = None
+    action_result: Optional[Dict] = None
 
 class ChatErrorResponse(BaseModel):
     error: str

@@ -423,34 +423,166 @@ def test_with_api_request():
     except Exception as e:
         print(f"Błąd: {str(e)}")
 
-def chat_with_owl(message: str) -> str:
-    """Chat with the owl mascot using Gemini"""
+def chat_with_owl(message: str) -> Dict:
+    """Chat with the owl mascot using Gemini with intelligent action detection"""
     try:
         configure_gemini()
         model = genai.GenerativeModel('gemini-2.5-flash')
         
-        owl_prompt = f"""
-        Jesteś sympatyczną sową-maskotką aplikacji do kalkulacji emerytur. 
-        Twoje imię to "ZUŚka" i jesteś ekspertem w dziedzinie emerytur i finansów osobistych.
+        # Rozszerzone rozpoznawanie akcji - różne warianty i synonimy
+        action_patterns = {
+            "calculate_pension": [
+                "oblicz emeryturę", "policz emeryturę", "kalkulator emerytury", 
+                "oblicz", "policz", "kalkulator", "emerytura", "emerytury",
+                "chcę obliczyć", "pomóż obliczyć", "jak obliczyć emeryturę"
+            ],
+            "show_statistics": [
+                "pokaż statystyki", "statystyki", "dane", "wykresy", 
+                "pokaż dane", "statystyki emerytur", "dane ekonomiczne",
+                "inflacja", "płace", "wzrost", "wartości"
+            ],
+            "health_check": [
+                "sprawdź zdrowie", "status aplikacji", "czy działa", 
+                "sprawdź aplikację", "zdrowie", "status", "działa",
+                "czy wszystko ok", "sprawdź system"
+            ],
+            "show_help": [
+                "pomoc", "funkcje", "co potrafisz", "co możesz", 
+                "pomóż", "help", "menu", "opcje", "co robić",
+                "jak używać", "instrukcja"
+            ]
+        }
         
-        Oto wiadomość od użytkownika: "{message}"
+        # Sprawdź czy wiadomość zawiera prośbę o wykonanie akcji
+        detected_action = None
+        message_lower = message.lower()
         
-        Odpowiedz jako przyjazna sowa, która:
-        1. Używa prostego, zrozumiałego języka
-        2. Jest pomocna i zachęcająca
-        3. Może odpowiadać na pytania o emerytury, finanse, aplikację
-        4. Czasami używa sówich wyrażeń jak "Hoo hoo!" lub "Skrzydła w górę!"
-        5. Jest profesjonalna, ale nieformalna
-        6. Zawsze kończy zachęcając do korzystania z aplikacji
+        for action, patterns in action_patterns.items():
+            for pattern in patterns:
+                if pattern in message_lower:
+                    detected_action = action
+                    break
+            if detected_action:
+                break
         
-        Odpowiedz krótko (maksymalnie 3-4 zdania) i przyjaźnie.
-        """
+        if detected_action:
+            # Wykonaj akcję
+            action_result = execute_owl_action(detected_action, message)
+            if action_result["success"]:
+                owl_prompt = f"""
+                Jesteś ZUŚka, sympatyczną sową-maskotką aplikacji do kalkulacji emerytur.
+                
+                Użytkownik napisał: "{message}"
+                Wykonałeś akcję: {detected_action}
+                Wynik akcji: {action_result["data"]}
+                
+                Odpowiedz jako ZUŚka:
+                1. Potwierdź wykonanie akcji
+                2. Wyjaśnij wynik w prosty sposób
+                3. Użyj sówich wyrażeń jak "Hoo hoo!" lub "Skrzydła w górę!"
+                4. Zachęć do dalszego korzystania z aplikacji
+                
+                Odpowiedz krótko i przyjaźnie.
+                """
+            else:
+                owl_prompt = f"""
+                Jesteś ZUŚka, sympatyczną sową-maskotką aplikacji do kalkulacji emerytur.
+                
+                Użytkownik napisał: "{message}"
+                Próbowałeś wykonać akcję: {detected_action}
+                Ale wystąpił błąd: {action_result["error"]}
+                
+                Odpowiedz jako ZUŚka:
+                1. Przeproś za problem
+                2. Wyjaśnij co się stało
+                3. Zaproponuj alternatywne rozwiązanie
+                4. Użyj sówich wyrażeń
+                
+                Odpowiedz krótko i przyjaźnie.
+                """
+        else:
+            # Zwykła rozmowa
+            owl_prompt = f"""
+            Jesteś ZUŚka, sympatyczną sową-maskotką aplikacji do kalkulacji emerytur. 
+            Jesteś ekspertem w dziedzinie emerytur i finansów osobistych.
+            
+            Oto wiadomość od użytkownika: "{message}"
+            
+            Odpowiedz jako przyjazna sowa, która:
+            1. Używa prostego, zrozumiałego języka
+            2. Jest pomocna i zachęcająca
+            3. Może odpowiadać na pytania o emerytury, finanse, aplikację
+            4. Czasami używa sówich wyrażeń jak "Hoo hoo!" lub "Skrzydła w górę!"
+            5. Jest profesjonalna, ale nieformalna
+            6. Zawsze kończy zachęcając do korzystania z aplikacji
+            7. Może sugerować konkretne akcje jak "Powiedz 'oblicz emeryturę' żeby skorzystać z kalkulatora!"
+            
+            Odpowiedz krótko (maksymalnie 3-4 zdania) i przyjaźnie.
+            """
         
         response = model.generate_content(owl_prompt)
-        return response.text
+        
+        return {
+            "response": response.text,
+            "action_executed": detected_action,
+            "action_result": action_result if detected_action else None
+        }
         
     except Exception as e:
-        return f"Hoo hoo! Przepraszam, ale mam problem z połączeniem. Spróbuj ponownie za chwilę! 🦉"
+        return {
+            "response": f"Hoo hoo! Przepraszam, ale mam problem z połączeniem. Spróbuj ponownie za chwilę! 🦉",
+            "action_executed": None,
+            "action_result": None
+        }
+
+def execute_owl_action(action: str, message: str) -> Dict:
+    """Execute specific actions requested by user through ZUŚka"""
+    try:
+        if action == "calculate_pension":
+            # Przykład: wywołaj kalkulację emerytury
+            return {
+                "success": True,
+                "data": "Kalkulator emerytur jest gotowy! Wprowadź swoje dane w formularzu powyżej.",
+                "action": "redirect_to_calculator"
+            }
+        elif action == "show_statistics":
+            # Wywołaj endpoint statystyk
+            import requests
+            response = requests.get("http://127.0.0.1:8080/statistics")
+            if response.status_code == 200:
+                stats = response.json()
+                return {
+                    "success": True,
+                    "data": f"Oto najnowsze statystyki: średnia płaca {len(stats['average_wage'])} lat danych, inflacja {len(stats['inflation'])} lat danych.",
+                    "action": "show_statistics_data"
+                }
+            else:
+                return {"success": False, "error": "Nie udało się pobrać statystyk"}
+        elif action == "health_check":
+            # Sprawdź status aplikacji
+            import requests
+            response = requests.get("http://127.0.0.1:8080/health")
+            if response.status_code == 200:
+                health = response.json()
+                return {
+                    "success": True,
+                    "data": f"Aplikacja działa świetnie! Status: {health['status']}, wersja: {health['version']}",
+                    "action": "show_health_status"
+                }
+            else:
+                return {"success": False, "error": "Aplikacja ma problemy"}
+        elif action == "show_help":
+            # Pokaż dostępne funkcje
+            return {
+                "success": True,
+                "data": "Dostępne funkcje: 'oblicz emeryturę', 'pokaż statystyki', 'sprawdź zdrowie'. Powiedz mi co chcesz zrobić!",
+                "action": "show_help_menu"
+            }
+        else:
+            return {"success": False, "error": "Nieznana akcja"}
+            
+    except Exception as e:
+        return {"success": False, "error": f"Błąd wykonania akcji: {str(e)}"}
 
 if __name__ == "__main__":
     main()
