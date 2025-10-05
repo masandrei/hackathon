@@ -59,10 +59,11 @@ vercel
 - **Components:** shadcn/ui + Radix UI
 - **Icons:** Lucide React
 - **Fonts:** Inter + JetBrains Mono (Google Fonts CDN)
+- **Package manager:** npm 
 
 ### Backend
 - **Framework:** FastAPI
-- **Language:** Python 3.11
+- **Language:** Python 3.12
 - **Package Manager:** Poetry
 
 ## 🔧 Development
