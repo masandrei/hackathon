@@ -21,9 +21,13 @@ export function JobForm({ job, onSave, onCancel }: JobFormProps) {
       startDate: "",
       endDate: "",
       baseSalary: 0,
-      companyName: "",
-      position: "",
     }
+  );
+  const [startYear, setStartYear] = useState(
+    job?.startDate ? new Date(job.startDate).getFullYear().toString() : ""
+  );
+  const [endYear, setEndYear] = useState(
+    job?.endDate ? new Date(job.endDate).getFullYear().toString() : ""
   );
   const [isCurrent, setIsCurrent] = useState(!job?.endDate);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,10 +35,15 @@ export function JobForm({ job, onSave, onCancel }: JobFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Konwertuj rok na datę (początek stycznia)
+    const startDate = `${startYear}-01-01`;
+    const endDate = isCurrent ? undefined : `${endYear}-01-01`;
+    
     // Walidacja
     const dataToValidate = {
       ...formData,
-      endDate: isCurrent ? undefined : formData.endDate,
+      startDate,
+      endDate,
     };
     
     const result = jobSchema.safeParse(dataToValidate);
@@ -52,7 +61,8 @@ export function JobForm({ job, onSave, onCancel }: JobFormProps) {
     
     onSave({
       ...formData,
-      endDate: isCurrent ? undefined : formData.endDate,
+      startDate,
+      endDate,
     });
   };
 
@@ -84,42 +94,19 @@ export function JobForm({ job, onSave, onCancel }: JobFormProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Stanowisko */}
+          {/* Rok rozpoczęcia */}
           <div>
             <label className="text-sm font-medium text-[--ink] mb-2 block">
-              Stanowisko <span className="text-[--gray]">(opcjonalnie)</span>
+              Rok rozpoczęcia pracy <span className="text-red-500">*</span>
             </label>
             <Input
-              value={formData.position}
-              onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+              type="number"
+              value={startYear}
+              onChange={(e) => setStartYear(e.target.value)}
               className="h-12 rounded-xl"
-              placeholder="np. Senior Developer"
-            />
-          </div>
-
-          {/* Nazwa firmy */}
-          <div>
-            <label className="text-sm font-medium text-[--ink] mb-2 block">
-              Nazwa firmy <span className="text-[--gray]">(opcjonalnie)</span>
-            </label>
-            <Input
-              value={formData.companyName}
-              onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-              className="h-12 rounded-xl"
-              placeholder="np. Tech Solutions Sp. z o.o."
-            />
-          </div>
-
-          {/* Data rozpoczęcia */}
-          <div>
-            <label className="text-sm font-medium text-[--ink] mb-2 block">
-              Data rozpoczęcia <span className="text-red-500">*</span>
-            </label>
-            <Input
-              type="date"
-              value={formData.startDate}
-              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-              className="h-12 rounded-xl"
+              placeholder="np. 2015"
+              min="1950"
+              max={new Date().getFullYear()}
               required
             />
             {errors.startDate && (
@@ -136,7 +123,7 @@ export function JobForm({ job, onSave, onCancel }: JobFormProps) {
               onChange={(e) => {
                 setIsCurrent(e.target.checked);
                 if (e.target.checked) {
-                  setFormData({ ...formData, endDate: "" });
+                  setEndYear("");
                 }
               }}
               className="w-5 h-5 rounded border-2 border-[--gray] text-[#00993F] focus:ring-[#00993F]"
@@ -146,17 +133,20 @@ export function JobForm({ job, onSave, onCancel }: JobFormProps) {
             </label>
           </div>
 
-          {/* Data zakończenia */}
+          {/* Rok zakończenia */}
           {!isCurrent && (
             <div>
               <label className="text-sm font-medium text-[--ink] mb-2 block">
-                Data zakończenia <span className="text-red-500">*</span>
+                Rok zakończenia pracy <span className="text-red-500">*</span>
               </label>
               <Input
-                type="date"
-                value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                type="number"
+                value={endYear}
+                onChange={(e) => setEndYear(e.target.value)}
                 className="h-12 rounded-xl"
+                placeholder="np. 2020"
+                min={startYear || "1950"}
+                max={new Date().getFullYear()}
                 required={!isCurrent}
               />
               {errors.endDate && (

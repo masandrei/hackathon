@@ -12,9 +12,7 @@ export function Step1Age() {
   const currentYear = new Date().getFullYear();
   const retirementYear = currentYear + (67 - age); // Assuming retirement at 67
 
-  useEffect(() => {
-    updateData({ age });
-  }, [age, updateData]);
+  // Usunięto useEffect - updateData tylko przy kliknięciu "Dalej"
 
   const handleNext = () => {
     updateData({ age });

@@ -39,53 +39,34 @@ export function JobCard({ job, onEdit, onDelete, index }: JobCardProps) {
             <Briefcase size={24} className="text-[#00993F]" />
           </div>
           <div className="flex-1 min-w-0">
-            {job.position && (
-              <h4 className="text-lg font-bold text-[--ink] truncate">
-                {job.position}
-              </h4>
-            )}
-            {job.companyName && (
-              <p className="text-sm text-[--gray] truncate">
-                {job.companyName}
-              </p>
-            )}
-            {!job.position && !job.companyName && (
-              <h4 className="text-lg font-bold text-[--ink]">
-                Praca #{index + 1}
-              </h4>
-            )}
+            <h4 className="text-lg font-bold text-[--ink]">
+              Praca #{index + 1}
+            </h4>
+            <p className="text-sm text-[--gray]">
+              {format(startDate, "yyyy", { locale: pl })} - {endDate ? format(endDate, "yyyy", { locale: pl }) : "obecnie"}
+            </p>
           </div>
         </div>
 
         {/* Details */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-2">
-            <Calendar size={16} className="text-[--gray]" />
-            <div className="text-sm">
-              <div className="text-[--gray]">Od</div>
-              <div className="font-semibold text-[--ink]">
-                {format(startDate, "MMM yyyy", { locale: pl })}
-              </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between bg-[#F6F8FA] rounded-xl p-4">
+            <div className="flex items-center gap-2">
+              <Calendar size={18} className="text-[--gray]" />
+              <div className="text-sm text-[--gray]">Okres zatrudnienia</div>
+            </div>
+            <div className="font-semibold text-[--ink]">
+              {format(startDate, "yyyy", { locale: pl })} - {endDate ? format(endDate, "yyyy", { locale: pl }) : "obecnie"}
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <Calendar size={16} className="text-[--gray]" />
-            <div className="text-sm">
-              <div className="text-[--gray]">Do</div>
-              <div className="font-semibold text-[--ink]">
-                {endDate ? format(endDate, "MMM yyyy", { locale: pl }) : "Teraz"}
-              </div>
+          <div className="flex items-center justify-between bg-[#F6F8FA] rounded-xl p-4">
+            <div className="flex items-center gap-2">
+              <DollarSign size={18} className="text-[--gray]" />
+              <div className="text-sm text-[--gray]">Wynagrodzenie brutto</div>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-2 col-span-2">
-            <DollarSign size={16} className="text-[--gray]" />
-            <div className="text-sm">
-              <div className="text-[--gray]">Wynagrodzenie</div>
-              <div className="font-semibold text-[--ink]">
-                {job.baseSalary.toLocaleString("pl-PL")} zł / mies.
-              </div>
+            <div className="font-semibold text-[--ink]">
+              {job.baseSalary.toLocaleString("pl-PL")} zł
             </div>
           </div>
         </div>
